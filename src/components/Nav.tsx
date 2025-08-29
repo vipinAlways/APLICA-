@@ -28,23 +28,24 @@ import { ChevronDownIcon, CreditCardIcon, LogOut } from "lucide-react";
 import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const Nav = () => {
   const session = useSession();
   const isMobile = useIsMobile();
-  if (!session.data) return <h1>helllllll yeah</h1>;
-  const data = session.data.user;
+
   return (
-    <nav>
-      <h1>Aplica-</h1>
+    <nav className=" w-full group ">
+     <div className="flex items-center justify-between w-full p-2 group-hover:scale-[0.98] group-hover:bg-white/40 backdrop-blur-xl transition-all duration-150 ease-linear rounded-lg text-2xl">
+       <Link href={"/"}><i>Aplica-</i></Link>
       <div>
-        {session ? (
+        {session.data ? (
           isMobile ? (
             <Drawer>
               <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                 <Avatar>
                   <AvatarImage
-                    src={data.image || ""}
+                    src={session.data.user.image || ""}
                     alt="avatar"
                     className="rounded-full"
                   />
@@ -53,17 +54,21 @@ const Nav = () => {
                 <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                   <p className="w-full truncate text-sm">
                     {" "}
-                    {data.name ?? "User"}
+                    {session.data.user.name ?? "User"}
                   </p>
-                  <p className="w-full truncate text-xs">{data.email}</p>
+                  <p className="w-full truncate text-xs">
+                    {session.data.user.email}
+                  </p>
                 </div>
                 <ChevronDownIcon className="size-4 shrink-0" />
               </DrawerTrigger>
 
               <DrawerContent>
                 <DrawerHeader>
-                  <DrawerTitle>{data.name ?? ""}</DrawerTitle>
-                  <DrawerDescription>{data.email}</DrawerDescription>
+                  <DrawerTitle>{session.data.user.name ?? ""}</DrawerTitle>
+                  <DrawerDescription>
+                    {session.data.user.email}
+                  </DrawerDescription>
                 </DrawerHeader>
 
                 <DrawerFooter>
@@ -90,15 +95,17 @@ const Nav = () => {
             <DropdownMenu>
               <DropdownMenuTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                 <Avatar>
-                  <AvatarImage src={data.image || ""} />
+                  <AvatarImage src={session.data.user.image || ""} />
                 </Avatar>
 
                 <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                   <p className="w-full truncate text-sm">
                     {" "}
-                    {data.name ?? "User"}
+                    {session.data.user.name ?? "User"}
                   </p>
-                  <p className="w-full truncate text-xs">{data.email}</p>
+                  <p className="w-full truncate text-xs">
+                    {session.data.user.email}
+                  </p>
                 </div>
                 <ChevronDownIcon className="size-4 shrink-0" />
               </DropdownMenuTrigger>
@@ -107,10 +114,10 @@ const Nav = () => {
                 <DropdownMenuLabel>
                   <div className="flex flex-col gap-1">
                     <span className="truncate font-medium">
-                      {data.name ?? "user"}
+                      {session.data.user.name ?? "user"}
                     </span>
                     <span className="text-muted-foreground truncate text-sm font-normal">
-                      {data.email ?? "Email"}
+                      {session.data.user.email ?? "Email"}
                     </span>
                   </div>
                 </DropdownMenuLabel>
@@ -133,11 +140,12 @@ const Nav = () => {
             </DropdownMenu>
           )
         ) : (
-          <div>
-            <Button>SignIn</Button>
+          <div >
+            <Link href={"/api/auth/authentication"} className="text-xl">SignIn</Link>
           </div>
         )}
       </div>
+     </div>
     </nav>
   );
 };
