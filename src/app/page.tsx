@@ -1,10 +1,20 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import { api } from "~/trpc/react"; // ✅ TRPC client hook (adjust path if needed)
 
-const page = () => {
+const Page = () => {
+  const [resume, setResume] = useState<string>("");
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [previewUrl, setPreViewUrl] = useState<string>("");
+
+
+
   return (
     <div className="">
-      <div className="flex  w-full mt-20">
+      <div className="mt-20 flex w-full">
         <div className="flex h-96 flex-1 flex-col justify-around p-3 text-xl">
           <h1 className="text-2xl font-semibold">
             Turn Your Resume Into a Job-Winning Document in Minutes
@@ -26,10 +36,19 @@ const page = () => {
           </Link>
         </div>
 
-        <div className="h-96 w-1/2 flex-1">dsd</div>
+        <div className="h-96 w-1/2 flex-1">
+          
+
+          {previewUrl && (
+            <iframe
+              src={previewUrl}
+              className="h-full w-full rounded-lg border"
+            ></iframe>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default page;
+export default Page;
