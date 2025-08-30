@@ -35,117 +35,124 @@ const Nav = () => {
   const isMobile = useIsMobile();
 
   return (
-    <nav className=" w-full group ">
-     <div className="flex items-center justify-between w-full p-2 group-hover:scale-[0.98] group-hover:bg-white/40 backdrop-blur-xl transition-all duration-150 ease-linear rounded-lg text-2xl">
-       <Link href={"/"}><i>Aplica-</i></Link>
-      <div>
-        {session.data ? (
-          isMobile ? (
-            <Drawer>
-              <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
-                <Avatar>
-                  <AvatarImage
-                    src={session.data.user.image || ""}
-                    alt="avatar"
-                    className="rounded-full"
-                  />
-                </Avatar>
+    <nav className="group w-full">
+      <div className="flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-focus:bg-white/40 group-active:scale-[0.98]">
+        <Link href={"/"}>
+          <i>Aplica-</i>
+        </Link>
+        <div className="flex w-80 items-center justify-center">
+          {session.data ? (
+            isMobile ? (
+              <Drawer>
+                <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
+                  <Avatar>
+                    <AvatarImage
+                      src={session.data.user.image || ""}
+                      alt="avatar"
+                      className="rounded-full"
+                    />
+                  </Avatar>
 
-                <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
-                  <p className="w-full truncate text-sm">
-                    {" "}
-                    {session.data.user.name ?? "User"}
-                  </p>
-                  <p className="w-full truncate text-xs">
-                    {session.data.user.email}
-                  </p>
-                </div>
-                <ChevronDownIcon className="size-4 shrink-0" />
-              </DrawerTrigger>
-
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>{session.data.user.name ?? ""}</DrawerTitle>
-                  <DrawerDescription>
-                    {session.data.user.email}
-                  </DrawerDescription>
-                </DrawerHeader>
-
-                <DrawerFooter>
-                  <Button
-                    variant={"outline"}
-                    onClick={() => {
-                      toast("Coming Soon");
-                    }}
-                  >
-                    <CreditCardIcon className="size-4 text-black" />
-                    Billing
-                  </Button>
-                  <Button
-                    variant={"outline"}
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
-                    <LogOut className="size-4 text-black" />
-                    Logout
-                  </Button>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
-                <Avatar>
-                  <AvatarImage src={session.data.user.image || ""} />
-                </Avatar>
-
-                <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
-                  <p className="w-full truncate text-sm">
-                    {" "}
-                    {session.data.user.name ?? "User"}
-                  </p>
-                  <p className="w-full truncate text-xs">
-                    {session.data.user.email}
-                  </p>
-                </div>
-                <ChevronDownIcon className="size-4 shrink-0" />
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" side="right" className="w-72">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col gap-1">
-                    <span className="truncate font-medium">
-                      {session.data.user.name ?? "user"}
-                    </span>
-                    <span className="text-muted-foreground truncate text-sm font-normal">
-                      {session.data.user.email ?? "Email"}
-                    </span>
+                  <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
+                    <p className="w-full truncate text-sm">
+                      {" "}
+                      {session.data.user.name ?? "User"}
+                    </p>
+                    <p className="w-full truncate text-xs">
+                      {session.data.user.email}
+                    </p>
                   </div>
-                </DropdownMenuLabel>
+                  <ChevronDownIcon className="size-4 shrink-0" />
+                </DrawerTrigger>
 
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="courser-pointer flex items-center justify-between">
-                  Billing
-                  <CreditCardIcon className="size-4 shrink-0" />
-                </DropdownMenuItem>
-                <DropdownMenuItem className="courser-pointer flex items-center justify-between">
-                  <button
-                    className="text-sm text-black"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
-                    Logout
-                  </button>
-                  <LogOut className="size-4 shrink-0" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
-        ) : (
-          <div >
-            <Link href={"/api/auth/authentication"} className="text-xl">SignIn</Link>
-          </div>
-        )}
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>{session.data.user.name ?? ""}</DrawerTitle>
+                    <DrawerDescription>
+                      {session.data.user.email}
+                    </DrawerDescription>
+                  </DrawerHeader>
+
+                  <DrawerFooter>
+                    <Button
+                      variant={"outline"}
+                      onClick={() => {
+                        toast("Coming Soon");
+                      }}
+                    >
+                      <CreditCardIcon className="size-4 text-black" />
+                      Billing
+                    </Button>
+                    <Button
+                      variant={"outline"}
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      <LogOut className="size-4 text-black" />
+                      Logout
+                    </Button>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="border-border/20 flex w-72 items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
+                  <Avatar>
+                    <AvatarImage src={session.data.user.image || ""} />
+                  </Avatar>
+
+                  <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
+                    <p className="w-full truncate text-sm">
+                      {" "}
+                      {session.data.user.name ?? "User"}
+                    </p>
+                    <p className="w-full truncate text-xs">
+                      {session.data.user.email}
+                    </p>
+                  </div>
+                  <ChevronDownIcon className="size-4 shrink-0" />
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  className="w-72"
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                >
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col gap-1">
+                      <span className="truncate font-medium">
+                        {session.data.user.name ?? "user"}
+                      </span>
+                      <span className="text-muted-foreground truncate text-sm font-normal">
+                        {session.data.user.email ?? "Email"}
+                      </span>
+                    </div>
+                  </DropdownMenuLabel>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="courser-pointer flex items-center justify-between">
+                    Billing
+                    <CreditCardIcon className="size-4 shrink-0" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="courser-pointer flex items-center justify-between">
+                    <button
+                      className="text-sm text-black"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      Logout
+                    </button>
+                    <LogOut className="size-4 shrink-0" />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )
+          ) : (
+            <div>
+              <Link href={"/api/auth/authentication"} className="text-xl">
+                SignIn
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
-     </div>
     </nav>
   );
 };

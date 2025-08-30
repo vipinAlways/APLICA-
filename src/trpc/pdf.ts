@@ -10,15 +10,15 @@ export const pdfRoute = createTRPCRouter({
   textextract: publicProcedure
     .input(
       z.object({
-        fileBase64: z.string(), // client sends file as base64 string
+        fileBase64: z.string(),
       }),
     )
+    //TODO:any type hatana hain 
     .mutation(async ({ input }) => {
       const { fileBase64 } = input;
       let fileName = "";
       let parsedText = "";
 
-      
       fileName = uuidv4();
       const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
 

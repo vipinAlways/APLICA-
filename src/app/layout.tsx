@@ -22,14 +22,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
-      <body className="p-2">
-        <Provider>
-          <Toaster />
-          <Nav />
+<html lang="en" className={`min-h-screen ${geist.variable}`}>
+  <body className=" w-full">
+    <Provider>
+        <Toaster />
+      <main className="w-full  min-h-screen border-4 bg-red-500">
+        <Nav />
+        <div className="w-full ">
           {children}
-        </Provider>
-      </body>
-    </html>
+        </div>
+      </main>
+    </Provider>
+  </body>
+</html>
   );
 }

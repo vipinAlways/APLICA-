@@ -10,16 +10,14 @@ const Page = () => {
   const [file, setFile] = useState<File | undefined>(undefined);
   const [previewUrl, setPreViewUrl] = useState<string>("");
 
-
-
   return (
-    <div className="">
-      <div className="mt-20 flex w-full">
-        <div className="flex h-96 flex-1 flex-col justify-around p-3 text-xl">
-          <h1 className="text-2xl font-semibold">
-            Turn Your Resume Into a Job-Winning Document in Minutes
+    <div className="h-full">
+      <div className="mt-20 flex w-full max-md:flex-col">
+        <div className="flex h-96 flex-1 flex-col items-center justify-around p-3 text-xl md:items-start">
+          <h1 className="w-full text-[1.7rem] font-bold text-wrap max-md:text-center md:text-5xl">
+            Turn Your Resume Into a Job Winning Document in Minutes
           </h1>
-          <p className="w-4/5 text-lg">
+          <p className="text-lg max-md:text-center md:w-4/5">
             <span>
               Building the perfect resume can be tough. Our AI tool makes it
               simple—instantly fixing typos, improving wording, and optimizing
@@ -36,16 +34,7 @@ const Page = () => {
           </Link>
         </div>
 
-        <div className="h-96 w-1/2 flex-1">
-          
-
-          {previewUrl && (
-            <iframe
-              src={previewUrl}
-              className="h-full w-full rounded-lg border"
-            ></iframe>
-          )}
-        </div>
+        <div className="h-96 w-full flex-1 md:w-1/2"></div>
       </div>
     </div>
   );
