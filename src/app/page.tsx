@@ -28,7 +28,7 @@ const Page = () => {
 
           <Link
             href={"/find"}
-            className="w-fit rounded-md bg-blue-700 p-1.5 text-zinc-100"
+            className="w-fit rounded-md bg-[#5167b7] p-1.5 text-zinc-100"
           >
             Find Job
           </Link>

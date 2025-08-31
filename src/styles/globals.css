@@ -2,11 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-body {
-  background: #c9d6ff;
-  background: -webkit-linear-gradient(to right, #e2e2e2, #c9d6ff);
-  color: #151529;
-}
+
 
 @theme {
   --font-sans:

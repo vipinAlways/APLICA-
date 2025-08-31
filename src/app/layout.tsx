@@ -26,7 +26,7 @@ export default function RootLayout({
   <body className=" w-full">
     <Provider>
         <Toaster />
-      <main className="w-full  min-h-screen border-4 bg-red-500">
+      <main className="w-full  min-h-screen  bg-muted">
         <Nav />
         <div className="w-full ">
           {children}

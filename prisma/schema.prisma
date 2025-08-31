@@ -49,6 +49,7 @@ model User {
     sessions      Session[]
     Resume        String?
     improvement   String[]
+    suggestion    String
 }
 
 model VerificationToken {

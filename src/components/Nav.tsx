@@ -36,7 +36,7 @@ const Nav = () => {
 
   return (
     <nav className="group w-full">
-      <div className="flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-focus:bg-white/40 group-active:scale-[0.98]">
+      <div className=" flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-focus:bg-white/40 group-hover:scale-[0.98]">
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
