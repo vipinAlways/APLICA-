@@ -1,6 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
+import { auth } from "~/server/auth";
 
 export const User = createTRPCRouter({
   newUser: publicProcedure
@@ -8,7 +13,7 @@ export const User = createTRPCRouter({
       z.object({
         userName: z.string(),
         email: z.string().email("Invalid email address"),
-        password:z.string().min(8,"password should be 8 character")
+        password: z.string().min(8, "password should be 8 character"),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -19,7 +24,7 @@ export const User = createTRPCRouter({
           },
           data: {
             name: input.userName,
-            password:input.password
+            password: input.password,
           },
         });
 
@@ -48,4 +53,28 @@ export const User = createTRPCRouter({
       throw new Error("Failed to check existing user");
     }
   }),
+  uplaodResume: protectedProcedure
+    .input(
+      z.object({
+        resume: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const session = await auth();
+        const updateUserResume = await ctx.db.user.update({
+          where: {
+            id: session?.user.id,
+          },
+          data: {
+            Resume: input.resume,
+          },
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Not able to receive file please try again",
+        });
+      }
+    }),
 });

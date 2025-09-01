@@ -14,19 +14,22 @@ export interface ErrData {
 
 export const pdfRoute = createTRPCRouter({
   textextractAndImproveMent: publicProcedure
-    .input(
-      z.object({
-        fileBase64: z.string().min(10, "File data is required"),
-      }),
-    )
+    .input(z.object({ pdfUrl: z.string().url() })) // ✅ expect a URL instead
     .mutation(async ({ input }) => {
-      const { fileBase64 } = input;
+      const { pdfUrl } = input;
       const fileName = uuidv4();
       const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
 
       try {
+        // ✅ Fetch PDF from URL
+        const res = await fetch(pdfUrl);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch PDF. Status: ${res.status}`);
+        }
+        const arrayBuffer = await res.arrayBuffer();
+        const fileBuffer = Buffer.from(arrayBuffer);
+
         // ✅ Save PDF temporarily
-        const fileBuffer = Buffer.from(fileBase64, "base64");
         await fs.writeFile(tempFilePath, fileBuffer);
 
         // ✅ Parse PDF text
@@ -60,7 +63,6 @@ export const pdfRoute = createTRPCRouter({
         const rawOutput =
           completion.choices?.[0]?.message?.content?.trim() ?? "{}";
 
-        // ✅ Parse JSON safely
         let result;
         try {
           result = JSON.parse(rawOutput);

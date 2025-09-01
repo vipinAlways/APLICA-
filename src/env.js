@@ -16,6 +16,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN:z.string(),
+    SAMBANOVA_API_KEY:z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -40,6 +41,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     UPLOADTHING_TOKEN:process.env.UPLOADTHING_TOKEN,
+    SAMBANOVA_API_KEY:process.env.SAMBANOVA_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

@@ -10,7 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { api } from "~/trpc/react"; // ✅ TRPC client hook (adjust path if needed)
+import UploadResume from "~/components/UploadResume";
+
 
 const Page = () => {
   const [resume, setResume] = useState<string>("");
@@ -40,6 +41,10 @@ const Page = () => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Deploy your resume</DialogTitle>
+
+                <div>
+                  <UploadResume/>
+                </div>
               </DialogHeader>
             </DialogContent>
           </Dialog>

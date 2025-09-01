@@ -128,10 +128,7 @@ const Nav = () => {
                   </DropdownMenuLabel>
 
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="courser-pointer flex items-center justify-between">
-                    Billing
-                    <CreditCardIcon className="size-4 shrink-0" />
-                  </DropdownMenuItem>
+                
                   <DropdownMenuItem className="courser-pointer flex items-center justify-between">
                     <button
                       className="text-sm text-black"
