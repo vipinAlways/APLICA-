@@ -3,6 +3,13 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import { api } from "~/trpc/react"; // ✅ TRPC client hook (adjust path if needed)
 
 const Page = () => {
@@ -26,12 +33,16 @@ const Page = () => {
             </span>
           </p>
 
-          <Link
-            href={"/find"}
-            className="w-fit rounded-md bg-[#5167b7] p-1.5 text-zinc-100"
-          >
-            Find Job
-          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Find Job</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Deploy your resume</DialogTitle>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="h-96 w-full flex-1 md:w-1/2"></div>
