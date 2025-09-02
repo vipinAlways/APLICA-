@@ -301,6 +301,8 @@ export const pdfRoute = createTRPCRouter({
           select: {
             id: true,
             SuggestedResume: true,
+            suggestion:true,
+            improvement:true,
           },
         });
 
@@ -311,7 +313,7 @@ export const pdfRoute = createTRPCRouter({
           });
         }
 
-        if (existingUser.SuggestedResume) {
+        if (existingUser.SuggestedResume || (existingUser.suggestion && existingUser.suggestion.length > 0) || (existingUser.improvement && existingUser.improvement.length > 0)) {
           return {
             success: true,
             message: "Resume already improved",
@@ -368,22 +370,17 @@ export const pdfRoute = createTRPCRouter({
         // Clean and parse AI response
         let aiResult: ResumeImprovementResponse;
         try {
-          // Clean the JSON string to remove control characters and fix common issues
+          
           let cleanedOutput = rawOutput
-            // Remove control characters (0x00-0x1F except \t, \n, \r)
             .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
-            // Fix escaped newlines and tabs in JSON strings
             .replace(/\\n/g, "\\n")
             .replace(/\\t/g, "\\t")
             .replace(/\\r/g, "\\r")
-            // Remove any markdown code blocks if present
             .replace(/```json\s*/g, "")
             .replace(/```\s*/g, "")
-            // Trim whitespace
             .trim();
 
-          // Extract JSON if it's wrapped in other text
-          const jsonStart = cleanedOutput.indexOf("{");
+            const jsonStart = cleanedOutput.indexOf("{");
           const jsonEnd = cleanedOutput.lastIndexOf("}");
 
           if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
@@ -446,47 +443,7 @@ export const pdfRoute = createTRPCRouter({
     }),
 
   // Additional procedure for direct file upload
-  parseUploadedFile: publicProcedure
-    .input(
-      z.object({
-        fileData: z.string().min(1, "File data is required"), // Base64 encoded
-        fileName: z.string().optional(),
-      }),
-    )
-    .output(
-      z.object({
-        success: z.boolean(),
-        text: z.string().optional(),
-        error: z.string().optional(),
-        pages: z.number().optional(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const tempFilePath = path.join(os.tmpdir(), `${uuidv4()}.pdf`);
 
-      try {
-        // Convert base64 to buffer and save to temp file
-        const buffer = Buffer.from(input.fileData, "base64");
-        await fs.writeFile(tempFilePath, buffer);
-
-        // Parse PDF
-        const text = await withTimeout(() => parsePdf(tempFilePath), 20_000);
-
-        return {
-          success: true,
-          text,
-        };
-      } catch (error) {
-        console.error("Error parsing uploaded PDF:", error);
-
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Failed to parse PDF",
-        };
-      } finally {
-        await cleanupFile(tempFilePath);
-      }
-    }),
 });
 
 // ---- Type Exports for Client ----

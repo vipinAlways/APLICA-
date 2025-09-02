@@ -1,6 +1,7 @@
 "use client";
-import {  File, FileIcon, ListStart, Loader2, X } from "lucide-react";
+import { File, FileIcon, ListStart, Loader2, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { jsPDF } from "jspdf";
 
 import { api } from "~/trpc/react";
 
@@ -8,30 +9,56 @@ const Page = () => {
   const utils = api.useUtils();
   const [activeTab, setActiveTab] = useState("Resume");
   const hasRunRef = useRef(false);
+  const [url,setPdfUrl] = useState<string>("")
 
   const [user] = api.user.existingUser.useSuspenseQuery();
 
-  
-  const { mutate, isPending,isError } =
+  const { mutate, isPending, isError } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       mutationKey: ["text and suggestion", user.Resume],
       onSuccess: () => utils.user.existingUser.invalidate(),
     });
 
-  
   useEffect(() => {
-    if (user?.Resume && !hasRunRef.current) {
+    if (user?.Resume) {
       hasRunRef.current = true;
       mutate({ pdfUrl: user.Resume });
     }
   }, [user?.Resume, mutate]);
 
+ 
 
-  let userImprovedResumeUrl ;
+  useEffect( () => {
+    const doc = new jsPDF({
+      unit: "pt", // use points for better alignment
+      format: "a4",
+    });
 
-  const convertTextIntoResume = useCallback(()=>{
-    
+    doc.setFont("courier", "normal"); // monospace font to preserve spacing
+    doc.setFontSize(12);
+
+    // split text into lines that fit A4 width
+    const pageWidth = doc.internal.pageSize.getWidth() - 40; // padding
+    const lines = doc.splitTextToSize(user.SuggestedResume!.replace("ðv",""), pageWidth);
+
+    let y = 40;
+    lines.forEach((line:string) => {
+      doc.text(line, 20, y);
+      y += 18; 
+      if (y > doc.internal.pageSize.getHeight() - 40) {
+        doc.addPage();
+        y = 40;
+      }
+    });
+
+    // make Blob URL for preview
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
   },[user.SuggestedResume])
+
+
+
   const navConsts = [
     {
       title: "Resume",
@@ -73,8 +100,16 @@ const Page = () => {
       title: "Improved Resume",
       Icon: FileIcon,
       Component: (
-        <div>
-          <ul>{user.SuggestedResume}</ul>
+        <div className="h-full w-full">
+          {user.SuggestedResume && url ? (
+            <iframe
+              src={url}
+              className="h-full w-full rounded-xl"
+            />
+            // <h1>{user.SuggestedResume.split("")}</h1>
+          ) : (
+            <p className="text-gray-500">No polished resume yet</p>
+          )}
         </div>
       ),
     },
@@ -108,8 +143,8 @@ const Page = () => {
     );
   }
 
-  if(isError){
-    return <X className=""/>
+  if (isError) {
+    return <X className="" />;
   }
 
   return (
