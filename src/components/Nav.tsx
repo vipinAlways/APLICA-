@@ -36,7 +36,7 @@ const Nav = () => {
 
   return (
     <nav className="group w-full">
-      <div className=" flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-focus:bg-white/40 group-hover:scale-[0.98]">
+      <div className="flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40">
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
@@ -85,7 +85,19 @@ const Nav = () => {
                     </Button>
                     <Button
                       variant={"outline"}
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        try {
+                          await signOut({
+                            callbackUrl: "/",
+                            redirect: true,
+                          });
+                        } catch (error) {
+                          console.error("Logout failed:", error);
+                          toast.error("Failed to logout. Please try again.");
+                        }
+                      }}
                     >
                       <LogOut className="size-4 text-black" />
                       Logout
@@ -128,14 +140,24 @@ const Nav = () => {
                   </DropdownMenuLabel>
 
                   <DropdownMenuSeparator />
-                
-                  <DropdownMenuItem className="courser-pointer flex items-center justify-between">
-                    <button
-                      className="text-sm text-black"
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                    >
-                      Logout
-                    </button>
+
+                  <DropdownMenuItem
+                    className="courser-pointer flex items-center justify-between"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      try {
+                        await signOut({
+                          callbackUrl: "/",
+                          redirect: true,
+                        });
+                      } catch (error) {
+                        console.error("Logout failed:", error);
+                        toast.error("Failed to logout. Please try again.");
+                      }
+                    }}
+                  >
+                    Logout
                     <LogOut className="size-4 shrink-0" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>

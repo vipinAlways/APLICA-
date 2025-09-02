@@ -49,7 +49,8 @@ model User {
     sessions      Session[]
     Resume        String?
     improvement   String[]
-    suggestion    String?
+    suggestion    String[]
+    SuggestedResume     String?
 }
 
 model VerificationToken {

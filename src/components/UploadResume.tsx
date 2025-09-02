@@ -21,7 +21,7 @@ const UploadResume = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
-  const { mutate, isPending } = api.user.uplaodResume.useMutation({
+  const { mutate, isPending } = api.user.uplaodResume.useMutation({ 
     onSuccess: () => router.push("/find"),
   });
 
