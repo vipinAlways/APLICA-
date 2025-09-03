@@ -30,29 +30,27 @@ const Page = () => {
 
   useEffect( () => {
     const doc = new jsPDF({
-      unit: "pt", // use points for better alignment
-      format: "a4",
+ 
     });
 
-    doc.setFont("courier", "normal"); // monospace font to preserve spacing
+    doc.setFont("courier", "normal");
     doc.setFontSize(12);
 
     // split text into lines that fit A4 width
     const pageWidth = doc.internal.pageSize.getWidth() - 40; // padding
-    const lines = doc.splitTextToSize(user.SuggestedResume!.replace("ðv",""), pageWidth);
+    const lines = doc.splitTextToSize(`${user.SuggestedResume}`, pageWidth);
 
-    let y = 40;
+    let y = 20;
     lines.forEach((line:string) => {
       doc.text(line, 20, y);
-      y += 18; 
-      if (y > doc.internal.pageSize.getHeight() - 40) {
+      y += 9; 
+      if (y > doc.internal.pageSize.getHeight() - 20) {
         doc.addPage();
-        y = 40;
+        y = 20;
       }
     });
 
-    // make Blob URL for preview
-    const blob = doc.output("blob");
+    const blob = doc.output("pdfjsnewwindow");
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
   },[user.SuggestedResume])
