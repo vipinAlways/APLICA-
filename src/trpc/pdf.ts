@@ -103,9 +103,7 @@ async function parsePdf(filePath: string): Promise<string> {
           new TRPCError({
             code: "BAD_REQUEST",
             message:
-              errData?.parserError ||
-              errData?.message ||
-              "Failed to parse PDF",
+              errData?.parserError || errData?.message || "Failed to parse PDF",
           }),
         );
       });
@@ -117,7 +115,8 @@ async function parsePdf(filePath: string): Promise<string> {
             reject(
               new TRPCError({
                 code: "BAD_REQUEST",
-                message: "PDF appears to be empty or contains no extractable text",
+                message:
+                  "PDF appears to be empty or contains no extractable text",
               }),
             );
             return;
@@ -316,26 +315,22 @@ export const pdfRoute = createTRPCRouter({
         }
 
         // Call AI for resume improvement
-        const completion = await withTimeout(
-          () =>
-            client.chat.completions.create({
-              model: "Meta-Llama-3.1-8B-Instruct",
-              temperature: 0.7,
-              max_tokens: 4000,
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "You are a professional resume improvement assistant. Respond ONLY with valid JSON matching the required schema. No markdown, no explanations, just JSON.",
-                },
-                {
-                  role: "user",
-                  content: `${promptForSuggestions}\n\nResume Text:\n${parsedText}\n\nReturn ONLY valid JSON with the following keys:\n- polished_resume: string\n- mistakes_and_suggestions: string[]\n- skills_to_learn: string[]\n- field: string (the primary domain/role of the candidate, e.g., 'Frontend Developer', 'Data Scientist')`,
-                },
-              ],
-            }),
-          45_000,
-        );
+        const completion = await client.chat.completions.create({
+          model: "Meta-Llama-3.1-8B-Instruct",
+          temperature: 0.7,
+          max_tokens: 4000,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a professional resume improvement assistant. Respond ONLY with valid JSON matching the required schema. No markdown, no explanations, just JSON.",
+            },
+            {
+              role: "user",
+              content: `${promptForSuggestions}\n\nResume Text:\n${parsedText}\n\nReturn ONLY valid JSON with the following keys:\n- polished_resume: string\n- mistakes_and_suggestions: string[]\n- skills_to_learn: string[]\n- field: string (the primary domain/role of the candidate, e.g., 'Frontend Developer', 'Data Scientist')`,
+            },
+          ],
+        });
 
         const rawOutput = completion.choices?.[0]?.message?.content?.trim();
 

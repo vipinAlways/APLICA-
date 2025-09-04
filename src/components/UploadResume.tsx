@@ -23,7 +23,7 @@ const UploadResume = () => {
 
   const { mutate, isPending } = api.user.uplaodResume.useMutation({
     onSuccess: async () => {
-      await api.useUtils().user.invalidate();
+      // await api.useUtils().user.invalidate();
       router.push("/find");
     },
   });
