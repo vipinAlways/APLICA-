@@ -15,13 +15,9 @@ import type {
   PDFParserInstance,
   ResumeImprovementResponse,
 } from "~/type/types";
-import type { Readable } from "stream";
 import type { WriteStream } from "fs";
 
-// ---- Type Definitions ----
-
 // ---- Schemas ----
-
 const ResumeSchema = z.object({
   polished_resume: z.string().min(1, "Polished resume cannot be empty"),
   mistakes_and_suggestions: z
@@ -30,6 +26,7 @@ const ResumeSchema = z.object({
   skills_to_learn: z
     .array(z.string())
     .min(1, "Must have at least one skill to learn"),
+  field: z.string().min(1, "Field cannot be empty"),
 });
 
 const InputSchema = z.object({
@@ -44,68 +41,55 @@ const OutputSchema = z.object({
 });
 
 // ---- Utility Functions ----
-
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
-  try {
-    const response = await fetch(url);
+  const response = await fetch(url);
 
-    if (!response.ok) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: `Failed to fetch PDF. Status: ${response.status}`,
-      });
-    }
-
-    if (!response.body) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "No response body received",
-      });
-    }
-
-    const fileStream: WriteStream = createWriteStream(destPath);
-
-    await new Promise<void>((resolve, reject) => {
-      try {
-        const reader = response.body!.getReader();
-
-        const pump = async (): Promise<void> => {
-          try {
-            const { done, value } = await reader.read();
-
-            if (done) {
-              fileStream.end();
-              resolve();
-              return;
-            }
-
-            const chunk = Buffer.from(value);
-            if (!fileStream.write(chunk)) {
-              await new Promise<void>((resolveWrite) => {
-                fileStream.once("drain", resolveWrite);
-              });
-            }
-
-            await pump();
-          } catch (error) {
-            fileStream.destroy();
-            reject(error instanceof Error ? error : new Error(String(error)));
-          }
-        };
-
-        fileStream.on("error", reject);
-        pump();
-      } catch (error) {
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-  } catch (error) {
+  if (!response.ok) {
     throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message:
-        error instanceof Error ? error.message : "Failed to stream PDF file",
+      code: "BAD_REQUEST",
+      message: `Failed to fetch PDF. Status: ${response.status}`,
     });
   }
+
+  if (!response.body) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "No response body received",
+    });
+  }
+
+  const fileStream: WriteStream = createWriteStream(destPath);
+
+  await new Promise<void>((resolve, reject) => {
+    const reader = response.body!.getReader();
+
+    const pump = async (): Promise<void> => {
+      try {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          fileStream.end();
+          resolve();
+          return;
+        }
+
+        const chunk = Buffer.from(value);
+        if (!fileStream.write(chunk)) {
+          await new Promise<void>((resolveWrite) => {
+            fileStream.once("drain", resolveWrite);
+          });
+        }
+
+        await pump();
+      } catch (error) {
+        fileStream.destroy();
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    };
+
+    fileStream.on("error", reject);
+    pump();
+  });
 }
 
 async function parsePdf(filePath: string): Promise<string> {
@@ -115,12 +99,13 @@ async function parsePdf(filePath: string): Promise<string> {
       const pdfParser: PDFParserInstance = new PDFParserClass(null, 1);
 
       pdfParser.on("pdfParser_dataError", (errData: PDFParserError) => {
-        const errorMessage =
-          errData?.parserError || errData?.message || "Failed to parse PDF";
         reject(
           new TRPCError({
             code: "BAD_REQUEST",
-            message: errorMessage,
+            message:
+              errData?.parserError ||
+              errData?.message ||
+              "Failed to parse PDF",
           }),
         );
       });
@@ -132,8 +117,7 @@ async function parsePdf(filePath: string): Promise<string> {
             reject(
               new TRPCError({
                 code: "BAD_REQUEST",
-                message:
-                  "PDF appears to be empty or contains no extractable text",
+                message: "PDF appears to be empty or contains no extractable text",
               }),
             );
             return;
@@ -179,11 +163,11 @@ async function withTimeout<T>(fn: () => Promise<T>, ms: number): Promise<T> {
     }, ms);
 
     fn()
-      .then((result: T) => {
+      .then((result) => {
         clearTimeout(timer);
         resolve(result);
       })
-      .catch((error: unknown) => {
+      .catch((error) => {
         clearTimeout(timer);
         reject(error instanceof Error ? error : new Error(String(error)));
       });
@@ -193,18 +177,13 @@ async function withTimeout<T>(fn: () => Promise<T>, ms: number): Promise<T> {
 async function cleanupFile(filePath: string): Promise<void> {
   try {
     await fs.unlink(filePath);
-  } catch (error) {
-    // File might not exist or already deleted, log but don't throw
-    console.warn(
-      `Failed to cleanup file ${filePath}:`,
-      error instanceof Error ? error.message : String(error),
-    );
+  } catch {
+    // ignore missing file
   }
 }
 
 function extractFallbackData(text: string): ResumeImprovementResponse | null {
   try {
-    // Try to extract structured data even from malformed response
     const lines = text
       .split("\n")
       .map((line) => line.trim())
@@ -213,6 +192,7 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
     let polished_resume = "";
     let mistakes_and_suggestions: string[] = [];
     let skills_to_learn: string[] = [];
+    let field = "";
 
     let currentSection = "";
 
@@ -231,19 +211,11 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
       } else if (lowerLine.includes("skill") || lowerLine.includes("learn")) {
         currentSection = "skills";
         continue;
-      }
-
-      // Skip JSON syntax lines
-      if (
-        line.includes("{") ||
-        line.includes("}") ||
-        line.includes("[") ||
-        line.includes("]")
-      ) {
+      } else if (lowerLine.includes("field") || lowerLine.includes("role")) {
+        currentSection = "field";
         continue;
       }
 
-      // Extract content based on current section
       const cleanLine = line.replace(/^["\-\*\•]\s*/, "").replace(/[",]$/, "");
 
       if (currentSection === "resume" && cleanLine.length > 20) {
@@ -252,10 +224,11 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
         mistakes_and_suggestions.push(cleanLine);
       } else if (currentSection === "skills" && cleanLine.length > 3) {
         skills_to_learn.push(cleanLine);
+      } else if (currentSection === "field" && cleanLine.length > 2) {
+        field = cleanLine;
       }
     }
 
-    // Validate extracted data
     if (
       polished_resume.length > 50 &&
       mistakes_and_suggestions.length > 0 &&
@@ -265,6 +238,7 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
         polished_resume: polished_resume.trim(),
         mistakes_and_suggestions,
         skills_to_learn,
+        field: field || "General",
       };
     }
 
@@ -276,7 +250,6 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
 }
 
 // ---- Main Router ----
-
 export const pdfRoute = createTRPCRouter({
   textextractAndImproveMent: publicProcedure
     .input(InputSchema)
@@ -301,8 +274,9 @@ export const pdfRoute = createTRPCRouter({
           select: {
             id: true,
             SuggestedResume: true,
-            suggestion:true,
-            improvement:true,
+            suggestion: true,
+            improvement: true,
+            field: true,
           },
         });
 
@@ -313,7 +287,12 @@ export const pdfRoute = createTRPCRouter({
           });
         }
 
-        if (existingUser.SuggestedResume || (existingUser.suggestion && existingUser.suggestion.length > 0) || (existingUser.improvement && existingUser.improvement.length > 0)) {
+        if (
+          existingUser.SuggestedResume ||
+          (existingUser.suggestion && existingUser.suggestion.length > 0) ||
+          (existingUser.improvement && existingUser.improvement.length > 0) ||
+          existingUser.field
+        ) {
           return {
             success: true,
             message: "Resume already improved",
@@ -351,7 +330,7 @@ export const pdfRoute = createTRPCRouter({
                 },
                 {
                   role: "user",
-                  content: `${promptForSuggestions}\n\nResume Text:\n${parsedText}\n\nReturn ONLY valid JSON with: polished_resume, mistakes_and_suggestions, skills_to_learn`,
+                  content: `${promptForSuggestions}\n\nResume Text:\n${parsedText}\n\nReturn ONLY valid JSON with the following keys:\n- polished_resume: string\n- mistakes_and_suggestions: string[]\n- skills_to_learn: string[]\n- field: string (the primary domain/role of the candidate, e.g., 'Frontend Developer', 'Data Scientist')`,
                 },
               ],
             }),
@@ -370,7 +349,6 @@ export const pdfRoute = createTRPCRouter({
         // Clean and parse AI response
         let aiResult: ResumeImprovementResponse;
         try {
-          
           let cleanedOutput = rawOutput
             .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
             .replace(/\\n/g, "\\n")
@@ -380,14 +358,12 @@ export const pdfRoute = createTRPCRouter({
             .replace(/```\s*/g, "")
             .trim();
 
-            const jsonStart = cleanedOutput.indexOf("{");
+          const jsonStart = cleanedOutput.indexOf("{");
           const jsonEnd = cleanedOutput.lastIndexOf("}");
 
           if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
             cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
           }
-
-          console.log("Cleaned AI output:", cleanedOutput);
 
           const parsedJson = JSON.parse(cleanedOutput);
           aiResult = ResumeSchema.parse(parsedJson);
@@ -395,7 +371,6 @@ export const pdfRoute = createTRPCRouter({
           console.error("Invalid AI response:", rawOutput);
           console.error("Parse error:", parseError);
 
-          // Try to extract meaningful information even if JSON parsing fails
           const fallbackResult = extractFallbackData(rawOutput);
           if (fallbackResult) {
             aiResult = fallbackResult;
@@ -414,6 +389,7 @@ export const pdfRoute = createTRPCRouter({
             SuggestedResume: aiResult.polished_resume,
             suggestion: aiResult.skills_to_learn,
             improvement: aiResult.mistakes_and_suggestions,
+            field: aiResult.field || "General",
           },
         });
 
@@ -437,15 +413,11 @@ export const pdfRoute = createTRPCRouter({
               : "An unexpected error occurred",
         });
       } finally {
-        // Always cleanup temp file
         await cleanupFile(tempFilePath);
       }
     }),
-
-  // Additional procedure for direct file upload
-
 });
 
-// ---- Type Exports for Client ----
+// ---- Type Exports ----
 export type PDFRouterInput = z.infer<typeof InputSchema>;
 export type PDFRouterOutput = z.infer<typeof OutputSchema>;

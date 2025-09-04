@@ -2,6 +2,7 @@ export interface ResumeImprovementResponse {
   polished_resume: string;
   mistakes_and_suggestions: string[];
   skills_to_learn: string[];
+  field:string
 }
 
 

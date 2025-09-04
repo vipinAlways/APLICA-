@@ -1,22 +1,21 @@
 "use client";
 import { File, FileIcon, ListStart, Loader2, X } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { jsPDF } from "jspdf";
-
 import { api } from "~/trpc/react";
+import Jobs from "~/components/Jobs";
 
 const Page = () => {
-  const utils = api.useUtils();
   const [activeTab, setActiveTab] = useState("Resume");
   const hasRunRef = useRef(false);
-  const [url,setPdfUrl] = useState<string>("")
+  const [url, setPdfUrl] = useState<string>("");
 
   const [user] = api.user.existingUser.useSuspenseQuery();
 
   const { mutate, isPending, isError } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       mutationKey: ["text and suggestion", user.Resume],
-      onSuccess: () => utils.user.existingUser.invalidate(),
+      onSuccess: () => api.useUtils().user.existingUser.invalidate(),
     });
 
   useEffect(() => {
@@ -26,36 +25,32 @@ const Page = () => {
     }
   }, [user?.Resume, mutate]);
 
- 
-
-  useEffect( () => {
+  useEffect(() => {
     const doc = new jsPDF({
- 
+      unit: "pt",
+      format: "a4",
     });
 
     doc.setFont("courier", "normal");
     doc.setFontSize(12);
 
-    // split text into lines that fit A4 width
-    const pageWidth = doc.internal.pageSize.getWidth() - 40; // padding
+    const pageWidth = doc.internal.pageSize.getWidth() - 40;
     const lines = doc.splitTextToSize(`${user.SuggestedResume}`, pageWidth);
 
     let y = 20;
-    lines.forEach((line:string) => {
+    lines.forEach((line: string) => {
       doc.text(line, 20, y);
-      y += 9; 
+      y += 9;
       if (y > doc.internal.pageSize.getHeight() - 20) {
         doc.addPage();
         y = 20;
       }
     });
 
-    const blob = doc.output("pdfjsnewwindow");
+    const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
-  },[user.SuggestedResume])
-
-
+  }, [user.SuggestedResume]);
 
   const navConsts = [
     {
@@ -100,11 +95,7 @@ const Page = () => {
       Component: (
         <div className="h-full w-full">
           {user.SuggestedResume && url ? (
-            <iframe
-              src={url}
-              className="h-full w-full rounded-xl"
-            />
-            // <h1>{user.SuggestedResume.split("")}</h1>
+            <p>{`${user.SuggestedResume}`}</p>
           ) : (
             <p className="text-gray-500">No polished resume yet</p>
           )}
@@ -133,7 +124,7 @@ const Page = () => {
     },
   ];
 
-  if (isPending) {
+  if (isPending || !user.Resume) {
     return (
       <div className="flex items-center justify-center">
         <Loader2 className="size-6 animate-spin" />
@@ -146,32 +137,39 @@ const Page = () => {
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <div className="col-auto grid h-full w-full grid-cols-2 gap-5 px-2">
-        <div className="h-full rounded-lg bg-white p-1">
-          <nav className="mb-3 flex gap-3 border-b pb-2">
-            {navConsts.map((item) => (
-              <button
-                key={item.title}
-                className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium ${
-                  activeTab === item.title
-                    ? "bg-gray-200 text-black"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-                onClick={() => setActiveTab(item.title)}
-              >
-                <item.Icon className="size-4" />
-                {item.title}
-              </button>
-            ))}
-          </nav>
-          <div className="h-[calc(100%-2.5rem)]">
-            {navConsts.find((tab) => tab.title === activeTab)?.Component}
+    <Suspense fallback={<Loader2 className="mx-auto size-5 animate-spin" />}>
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2">
+          <div className="sticky top-0 h-full rounded-lg bg-white p-1">
+            <div className="flex h-full flex-col">
+              <nav className="mb-3 flex gap-3 border-b pb-2">
+                {navConsts.map((item) => (
+                  <button
+                    key={item.title}
+                    className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium ${
+                      activeTab === item.title
+                        ? "bg-gray-200 text-black"
+                        : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setActiveTab(item.title)}
+                  >
+                    <item.Icon className="size-4" />
+                    {item.title}
+                  </button>
+                ))}
+              </nav>
+              <div className="flex-1 overflow-y-auto">
+                {navConsts.find((tab) => tab.title === activeTab)?.Component}
+              </div>
+            </div>
+          </div>
+
+          <div className="h-full flex-1 overflow-y-auto rounded-lg p-2">
+            <Jobs fetchedQuery={user.field ?? ""} />
           </div>
         </div>
-        <div className="h-full flex-1 rounded-lg p-2"></div>
       </div>
-    </div>
+    </Suspense>
   );
 };
 

@@ -19,8 +19,9 @@ Take the provided resume text and return a JSON object with the following struct
   ],
 
   "skills_to_learn": [
-    "List recommended technical skills, certifications, tools, or soft skills that are relevant to the user’s field and will strengthen the resume."
-  ]
+    "List recommended technical skills, certifications, tools, or soft skills that are relevant to the user's field and will strengthen the resume."
+  ],
+  "field":"Give me the field where at user want to find the job"
 }
 
 Rules:

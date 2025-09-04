@@ -1,4 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { jobsRoute } from "~/trpc/FetchJobs";
 import { pdfRoute } from "~/trpc/pdf";
 import { User } from "~/trpc/User";
 
@@ -10,6 +11,7 @@ import { User } from "~/trpc/User";
 export const appRouter = createTRPCRouter({
   user: User,
   pdfRoute: pdfRoute,
+  getjobs: jobsRoute,
 });
 
 // export type definition of API
