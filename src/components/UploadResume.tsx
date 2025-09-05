@@ -21,17 +21,18 @@ const UploadResume = () => {
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
 
-  const { mutate, isPending } = api.user.uplaodResume.useMutation({
-    onSuccess: async () => {
-      // await api.useUtils().user.invalidate();
-      router.push("/find");
-    },
-  });
+  const { mutate, isPending } =
+    api.pdfRoute.textextractAndImproveMent.useMutation({
+      onSuccess: async () => {
+        // await api.useUtils().user.invalidate();
+        router.push("/find");
+      },
+    });
 
   const { startUpload, isUploading } = useUT("pdfformUser", {
     onClientUploadComplete: (res) => {
       if (res?.[0]?.url) {
-        mutate({ resume: res[0].url });
+        mutate({ pdfUrl: res[0].url });
       }
     },
   });
@@ -151,7 +152,7 @@ const UploadResume = () => {
             onClick={handleContinue}
             disabled={(!user?.Resume && !pdfFile) || isUploading}
           >
-            Continue
+            Continue {isPending &&  <Loader2 className="animate-spin size-4"/>}
           </Button>
         </div>
       </div>

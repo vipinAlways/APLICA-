@@ -9,21 +9,20 @@ const Find = () => {
   const [activeTab, setActiveTab] = useState("Resume");
   const hasRunRef = useRef(false);
   const [url, setPdfUrl] = useState<string>("");
-    const [user] = api.user.existingUser.useSuspenseQuery()
-  
+  const [user] = api.user.existingUser.useSuspenseQuery();
 
-  const { mutate, isPending, isError } =
-    api.pdfRoute.textextractAndImproveMent.useMutation({
-      mutationKey: ["text and suggestion", user.Resume],
-      onSuccess: () => api.useUtils().user.existingUser.invalidate(),
-    });
+  // const { mutate, isPending, isError } =
+  //   api.pdfRoute.textextractAndImproveMent.useMutation({
+  //     mutationKey: ["text and suggestion", user.Resume],
+  //     onSuccess: () => api.useUtils().user.existingUser.invalidate(),
+  //   });
 
-  useEffect(() => {
-    if (user?.Resume) {
-      hasRunRef.current = true;
-      mutate({ pdfUrl: user.Resume });
-    }
-  }, [user?.Resume, mutate]);
+  // useEffect(() => {
+  //   if (user?.Resume) {
+  //     hasRunRef.current = true;
+  //     mutate({ pdfUrl: user.Resume });
+  //   }
+  // }, [user?.Resume, mutate]);
 
   useEffect(() => {
     const doc = new jsPDF({
@@ -75,7 +74,7 @@ const Find = () => {
       Icon: ListStart,
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
-          {!isPending && user.suggestion && user.suggestion?.length > 0 ? (
+          {user.suggestion && user.suggestion?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.suggestion.map((m: string, i: number) => (
                 <li key={i} className="text-sm text-gray-700">
@@ -84,7 +83,7 @@ const Find = () => {
               ))}
             </ul>
           ) : (
-            !isPending && <p className="text-gray-500">No mistakes found 🎉</p>
+            <p className="text-gray-500">No mistakes found 🎉</p>
           )}
         </div>
       ),
@@ -108,7 +107,7 @@ const Find = () => {
       Icon: X,
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
-          {!isPending && user.improvement && user.improvement?.length > 0 ? (
+          {user.improvement && user.improvement?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.improvement.map((m: string, i: number) => (
                 <li key={i} className="text-sm text-gray-700">
@@ -117,14 +116,14 @@ const Find = () => {
               ))}
             </ul>
           ) : (
-            !isPending && <p className="text-gray-500">No mistakes found 🎉</p>
+            <p className="text-gray-500">No mistakes found 🎉</p>
           )}
         </div>
       ),
     },
   ];
 
-  if (isPending || !user.Resume) {
+  if (!user.Resume) {
     return (
       <div className="flex items-center justify-center">
         <Loader2 className="size-6 animate-spin" />

@@ -268,30 +268,7 @@ export const pdfRoute = createTRPCRouter({
           });
         }
 
-        const existingUser = await ctx.db.user.findFirst({
-          where: { id: session.user.id },
-          select: {
-            id: true,
-            SuggestedResume: true,
-            suggestion: true,
-            improvement: true,
-            field: true,
-          },
-        });
-
-        if (!existingUser) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "User not found",
-          });
-        }
-
-        if (
-          existingUser.SuggestedResume ||
-          (existingUser.suggestion && existingUser.suggestion.length > 0) ||
-          (existingUser.improvement && existingUser.improvement.length > 0) ||
-          existingUser.field
-        ) {
+        if (!input.pdfUrl) {
           return {
             success: true,
             message: "Resume already improved",
@@ -299,13 +276,13 @@ export const pdfRoute = createTRPCRouter({
         }
 
         // Stream PDF to temporary file
-        await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 100_000);
+        await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 20_000); // 20s
 
         // Parse PDF text
         const parsedText = await withTimeout(
           () => parsePdf(tempFilePath),
-          80_000,
-        );
+          15_000,
+        ); // 15s
 
         if (!parsedText || parsedText.trim().length < 50) {
           throw new TRPCError({
@@ -317,17 +294,17 @@ export const pdfRoute = createTRPCRouter({
         // Call AI for resume improvement
         const completion = await client.chat.completions.create({
           model: "Meta-Llama-3.1-8B-Instruct",
-          temperature: 0.7,
-          max_tokens: 4000,
+          temperature: 0.2, // Lower for more consistent JSON
+          max_tokens: 2000, // Reduced for speed
           messages: [
             {
               role: "system",
               content:
-                "You are a professional resume improvement assistant. Respond ONLY with valid JSON matching the required schema. No markdown, no explanations, just JSON.",
+                "You are a resume improvement assistant. Return only valid JSON with no additional text or markdown.",
             },
             {
               role: "user",
-              content: `${promptForSuggestions}\n\nResume Text:\n${parsedText}\n\nReturn ONLY valid JSON with the following keys:\n- polished_resume: string\n- mistakes_and_suggestions: string[]\n- skills_to_learn: string[]\n- field: string (the primary domain/role of the candidate, e.g., 'Frontend Developer', 'Data Scientist')`,
+              content: `${promptForSuggestions}\n\nResume:\n${parsedText.substring(0, 2500)}`, // Truncate input
             },
           ],
         });
@@ -385,12 +362,12 @@ export const pdfRoute = createTRPCRouter({
             suggestion: aiResult.skills_to_learn,
             improvement: aiResult.mistakes_and_suggestions,
             field: aiResult.field || "General",
+            Resume: input.pdfUrl,
           },
         });
 
         return {
           success: true,
-          rawText: parsedText,
           message: "Resume successfully analyzed and improved",
         };
       } catch (error) {
