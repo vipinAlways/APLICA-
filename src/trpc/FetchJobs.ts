@@ -7,16 +7,20 @@ export const jobsRoute = createTRPCRouter({
     .input(
       z.object({
         query: z.string().min(3, "Query Must be Valid"),
-        location: z.string().optional(),
+        country: z.string().optional(),
+        city: z.string().optional(),
         page: z.number().optional(),
+        isRomte: z.boolean().default(true),
       }),
     )
     .query(async ({ input }) => {
       const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(
         input.query,
-      )}&page=1&num_pages=${input.page ?? 1}&country=${encodeURIComponent(
-        input.location ?? "india",
-      )}&date_posted=all`;
+      )}&page=${encodeURIComponent(input.page ?? 1)}&num_pages=${encodeURIComponent(
+        input.page ?? 1,
+      )}&country=${encodeURIComponent(input.country ?? "IN")}&city=${encodeURIComponent(
+        input.city ?? "",
+      )}&date_posted=all&remote_jobs_only=${encodeURIComponent(input.isRomte)}`;
 
       const options = {
         method: "GET",

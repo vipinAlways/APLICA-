@@ -1,7 +1,5 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
-import { toast } from "sonner";
+import React from "react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -12,12 +10,7 @@ import {
 } from "~/components/ui/dialog";
 import UploadResume from "~/components/UploadResume";
 
-
 const Page = () => {
-  const [resume, setResume] = useState<string>("");
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [previewUrl, setPreViewUrl] = useState<string>("");
-
   return (
     <div className="h-full">
       <div className="mt-20 flex w-full max-md:flex-col">
@@ -43,7 +36,7 @@ const Page = () => {
                 <DialogTitle>Deploy your resume</DialogTitle>
 
                 <div>
-                  <UploadResume/>
+                  <UploadResume />
                 </div>
               </DialogHeader>
             </DialogContent>

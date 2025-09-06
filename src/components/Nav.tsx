@@ -109,7 +109,7 @@ const Nav = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger className="border-border/20 flex w-72 items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
-                    <AvatarImage src={session.data.user.image || ""} />
+                    <AvatarImage src={session.data.user.image ?? ""} />
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">

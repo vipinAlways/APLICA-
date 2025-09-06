@@ -15,16 +15,17 @@ const { useUploadThing: useUT } = generateReactHelpers<OurFileRouter>();
 
 const UploadResume = () => {
   const [isDrageOver, setisDrageOver] = useState(false);
-  const [pdfFile, setPdfFile] = useState<File[]>();
+  const [pdfFile, setPdfFile] = useState<File[] | null>();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-
+  const utils = api.useUtils();
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
 
   const { mutate, isPending } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       onSuccess: async () => {
-        // await api.useUtils().user.invalidate();
+        await utils.user.existingUser.invalidate();
+        console.log("hoa kya nahi hua");
         router.push("/find");
       },
     });
@@ -60,12 +61,11 @@ const UploadResume = () => {
     }
 
     // If user already has a resume → skip upload
-    if (user?.Resume) {
+    if (user?.Resume && !pdfFile) {
       router.push("/find");
       return;
     }
 
-    // Otherwise upload new file
     if (pdfFile) {
       await startUpload(pdfFile);
     }
@@ -80,19 +80,15 @@ const UploadResume = () => {
   return (
     <Suspense fallback={<Loader2 className="size-6 animate-spin" />}>
       <div className="w-full">
-        {/* Resume Preview */}
         <div className="mb-4 flex w-full justify-center">
-          {user?.Resume ? (
-            <iframe src={user.Resume} className="h-72 w-4/5 rounded-md" />
-          ) : (
-            pdfFile &&
-            pdfFile[0] && (
-              <iframe
-                src={URL.createObjectURL(pdfFile[0])}
-                className="h-72 w-4/5 rounded-md"
-              />
-            )
-          )}
+          <iframe
+            src={
+              pdfFile && pdfFile.length > 0
+                ? URL.createObjectURL(pdfFile[0]!)
+                : user.Resume!
+            }
+            className="h-72 w-4/5 rounded-md"
+          />
         </div>
 
         {/* Dropzone */}
@@ -152,7 +148,7 @@ const UploadResume = () => {
             onClick={handleContinue}
             disabled={(!user?.Resume && !pdfFile) || isUploading}
           >
-            Continue {isPending &&  <Loader2 className="animate-spin size-4"/>}
+            Continue {isPending && <Loader2 className="size-4 animate-spin" />}
           </Button>
         </div>
       </div>

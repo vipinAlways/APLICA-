@@ -7,24 +7,12 @@ import Jobs from "~/components/Jobs";
 
 const Find = () => {
   const [activeTab, setActiveTab] = useState("Resume");
-  const hasRunRef = useRef(false);
   const [url, setPdfUrl] = useState<string>("");
-  const [user] = api.user.existingUser.useSuspenseQuery();
-
-  // const { mutate, isPending, isError } =
-  //   api.pdfRoute.textextractAndImproveMent.useMutation({
-  //     mutationKey: ["text and suggestion", user.Resume],
-  //     onSuccess: () => api.useUtils().user.existingUser.invalidate(),
-  //   });
-
-  // useEffect(() => {
-  //   if (user?.Resume) {
-  //     hasRunRef.current = true;
-  //     mutate({ pdfUrl: user.Resume });
-  //   }
-  // }, [user?.Resume, mutate]);
+  const { data: user, isLoading } = api.user.existingUser.useQuery();
 
   useEffect(() => {
+    if (!user?.SuggestedResume) return;
+
     const doc = new jsPDF({
       unit: "pt",
       format: "a4",
@@ -47,10 +35,24 @@ const Find = () => {
     });
 
     const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    setPdfUrl(url);
-  }, [user.SuggestedResume]);
+    const objectUrl = URL.createObjectURL(blob);
+    setPdfUrl(objectUrl);
 
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [user?.SuggestedResume]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center">
+        <Loader2 className="size-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <p>server Error</p>;
+  }
   const navConsts = [
     {
       title: "Resume",
@@ -123,16 +125,8 @@ const Find = () => {
     },
   ];
 
-  if (!user.Resume) {
-    return (
-      <div className="flex items-center justify-center">
-        <Loader2 className="size-6 animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex h-screen w-full items-center justify-center pb-2">
       <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2">
         <div className="sticky top-0 h-full rounded-lg bg-white p-1">
           <div className="flex h-full flex-col">
