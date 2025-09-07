@@ -16,6 +16,7 @@ import {
 
 import type { JobCardProps } from "~/type/types";
 import LocationSearch from "./LocationSearch";
+import JobContentApply from "./JobContentApply";
 
 const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [query, setQuery] = useState(fetchedQuery);
@@ -181,9 +182,13 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>{job.job_title}</DialogTitle>
-                    <DialogDescription>{job.job_description}</DialogDescription>
+                    <DialogTitle><i>Aplica-</i></DialogTitle>
+                    <DialogDescription>Apply here</DialogDescription>
                   </DialogHeader>
+
+                  <div>
+                    <JobContentApply job={job}/>
+                  </div>
                 </DialogContent>
               </Dialog>
             </CardContent>
