@@ -11,7 +11,12 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
           
           <p>{job.job_description}</p>
         </section>
-        <section></section>
+        <section>
+            <div>
+                <h1>Fit Score</h1>
+                
+            </div>
+        </section>
       </main>
       <footer>
         <Link

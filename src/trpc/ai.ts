@@ -16,31 +16,8 @@ import type {
   ResumeImprovementResponse,
 } from "~/type/types";
 import type { WriteStream } from "fs";
+import { OutputSchema, ResumeSchema } from "~/lib/scheama";
 
-// ---- Schemas ----
-const ResumeSchema = z.object({
-  polished_resume: z.string().min(1, "Polished resume cannot be empty"),
-  mistakes_and_suggestions: z
-    .array(z.string())
-    .min(1, "Must have at least one suggestion"),
-  skills_to_learn: z
-    .array(z.string())
-    .min(1, "Must have at least one skill to learn"),
-  field: z.string().min(1, "Field cannot be empty"),
-});
-
-const InputSchema = z.object({
-  pdfUrl: z.string().url("Must be a valid URL"),
-});
-
-const OutputSchema = z.object({
-  success: z.boolean(),
-  message: z.string().optional(),
-  error: z.string().optional(),
-  rawText: z.string().optional(),
-});
-
-// ---- Utility Functions ----
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
   const response = await fetch(url);
 
@@ -174,11 +151,7 @@ async function withTimeout<T>(fn: () => Promise<T>, ms: number): Promise<T> {
 }
 
 async function cleanupFile(filePath: string): Promise<void> {
-  try {
-    await fs.unlink(filePath);
-  } catch {
-    // ignore missing file
-  }
+  await fs.unlink(filePath);
 }
 
 function extractFallbackData(text: string): ResumeImprovementResponse | null {
@@ -251,7 +224,11 @@ function extractFallbackData(text: string): ResumeImprovementResponse | null {
 // ---- Main Router ----
 export const pdfRoute = createTRPCRouter({
   textextractAndImproveMent: publicProcedure
-    .input(InputSchema)
+    .input(
+      z.object({
+        pdfUrl: z.string().url("Must be a valid URL"),
+      }),
+    )
     .output(OutputSchema)
     .mutation(async ({ ctx, input }): Promise<z.infer<typeof OutputSchema>> => {
       const { pdfUrl } = input;
@@ -275,14 +252,12 @@ export const pdfRoute = createTRPCRouter({
           };
         }
 
-        // Stream PDF to temporary file
         await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 20_000); // 20s
 
-        // Parse PDF text
         const parsedText = await withTimeout(
           () => parsePdf(tempFilePath),
           15_000,
-        ); // 15s
+        );
 
         if (!parsedText || parsedText.trim().length < 50) {
           throw new TRPCError({
@@ -291,11 +266,10 @@ export const pdfRoute = createTRPCRouter({
           });
         }
 
-        // Call AI for resume improvement
         const completion = await client.chat.completions.create({
           model: "Meta-Llama-3.1-8B-Instruct",
-          temperature: 0.2, // Lower for more consistent JSON
-          max_tokens: 2000, // Reduced for speed
+          temperature: 0.2,
+          max_tokens: 2000,
           messages: [
             {
               role: "system",
@@ -318,7 +292,6 @@ export const pdfRoute = createTRPCRouter({
           });
         }
 
-        // Clean and parse AI response
         let aiResult: ResumeImprovementResponse;
         try {
           let cleanedOutput = rawOutput
@@ -354,7 +327,6 @@ export const pdfRoute = createTRPCRouter({
           }
         }
 
-        // Update user with AI suggestions
         await ctx.db.user.update({
           where: { id: session.user.id },
           data: {
@@ -388,8 +360,17 @@ export const pdfRoute = createTRPCRouter({
         await cleanupFile(tempFilePath);
       }
     }),
+
+  AccordingToJob: publicProcedure
+    .input(
+      z.object({
+        jobTitle: z.string(),
+        jobDescription: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { jobTitle, jobDescription } = input;
+    }),
 });
 
-// ---- Type Exports ----
-export type PDFRouterInput = z.infer<typeof InputSchema>;
 export type PDFRouterOutput = z.infer<typeof OutputSchema>;

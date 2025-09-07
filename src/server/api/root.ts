@@ -1,7 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { jobsRoute } from "~/trpc/FetchJobs";
 import { locations } from "~/trpc/locations";
-import { pdfRoute } from "~/trpc/pdf";
+import { pdfRoute } from "~/trpc/ai";
 import { User } from "~/trpc/User";
 
 /**

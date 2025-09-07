@@ -43,7 +43,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const data: JobCardProps[] = [
+  const data: JobCardProps[] = [  
     {
       employer_name: "TechNova Solutions",
       employer_logo: "https://via.placeholder.com/100x100.png?text=TechNova",
