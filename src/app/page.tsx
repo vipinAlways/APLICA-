@@ -35,10 +35,10 @@ const Page = () => {
               <DialogHeader>
                 <DialogTitle>Deploy your resume</DialogTitle>
 
+              </DialogHeader>
                 <div>
                   <UploadResume />
                 </div>
-              </DialogHeader>
             </DialogContent>
           </Dialog>
         </div>
