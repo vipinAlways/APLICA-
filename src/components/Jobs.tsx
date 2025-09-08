@@ -175,18 +175,18 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                 <span className="font-medium">{job.job_publisher}</span>
               </p>
 
-              <Dialog>
+              <Dialog >
                 <DialogTrigger asChild rel="noopener noreferrer">
                   <Button>Apply Now</Button>
                 </DialogTrigger>
 
-                <DialogContent>
-                  <DialogHeader>
+                <DialogContent className="sm:min-w-2xl max-w-sm  h-4/5 flex flex-col gap-4 ">
+                  <DialogHeader className="flex w-full justify-center items-center h-10 ">
                     <DialogTitle><i>Aplica-</i></DialogTitle>
                     <DialogDescription>Apply here</DialogDescription>
                   </DialogHeader>
 
-                  <div>
+                  <div className="w-full">
                     <JobContentApply job={job}/>
                   </div>
                 </DialogContent>

@@ -21,7 +21,7 @@ const UploadResume = () => {
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
 
-  const { mutate, isPending } =
+  const { mutate, isPending     } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       onSuccess: async () => {
         await utils.user.existingUser.invalidate();

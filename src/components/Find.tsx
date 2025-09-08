@@ -129,8 +129,8 @@ const Find = () => {
     <div className="flex h-screen w-full items-center justify-center pb-2">
       <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2 max-md:grid-cols-1">
         <div className="sticky top-0 h-full rounded-lg bg-white p-1">
-          <div className="flex h-full flex-col">
-            <nav className="mb-3 flex gap-3 border-b pb-2">
+          <div className="flex h-full flex-col ">
+            <nav className="mb-3 flex gap-3 border-b pb-2 w-full overflow-x-auto">
               {navConsts.map((item) => (
                 <button
                   key={item.title}
