@@ -16,3 +16,8 @@ export const OutputSchema = z.object({
   error: z.string().optional(),
   rawText: z.string().optional(),
 });
+
+export const promptForJobFitSchema = z.object({
+  fit_score: z.number(),
+  improvements: z.array(z.string()).min(1, "Must have at least one suggestion"),
+});

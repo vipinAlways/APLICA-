@@ -6,17 +6,19 @@ import { z } from "zod";
 import os from "os";
 import path from "path";
 import { client } from "~/lib/Ai";
-import { promptForSuggestions } from "~/lib/const";
+import { promptForJobFit, promptForSuggestions } from "~/lib/const";
 import { auth } from "~/server/auth";
 import { TRPCError } from "@trpc/server";
 import type {
   PDFParserConstructor,
   PDFParserError,
   PDFParserInstance,
+  promptForJobFitResponse,
   ResumeImprovementResponse,
 } from "~/type/types";
 import type { WriteStream } from "fs";
-import { OutputSchema, ResumeSchema } from "~/lib/scheama";
+import { OutputSchema, promptForJobFitSchema, ResumeSchema } from "~/lib/scheama";
+import { retryLink } from "@trpc/client";
 
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
   const response = await fetch(url);
@@ -154,7 +156,7 @@ async function cleanupFile(filePath: string): Promise<void> {
   await fs.unlink(filePath);
 }
 
-function extractFallbackData(text: string): ResumeImprovementResponse | null {
+function extractFallbackData(text: string): ResumeImprovementResponse | null | promptForJobFitResponse {
   try {
     const lines = text
       .split("\n")
@@ -368,8 +370,102 @@ export const pdfRoute = createTRPCRouter({
         jobDescription: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { jobTitle, jobDescription } = input;
+
+      const session = await auth();
+
+      if (!session?.user?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User must be authenticated",
+        });
+      }
+
+      const user = await ctx.db.user.findFirst({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          Resume: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "user not found",
+        });
+      }
+
+      if (!user.Resume) {
+        return null;
+      }
+
+      const fileName = uuidv4();
+      const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
+
+      const resumeUrl = user.Resume;
+      await withTimeout(() => streamPdfToFile(resumeUrl, tempFilePath), 20_000);
+
+      const parsedText = await withTimeout(
+        () => parsePdf(tempFilePath),
+        15_000,
+      );
+      const completion = await client.chat.completions.create({
+        model: "Meta-Llama-3.1-8B-Instruct",
+        temperature: 0.2,
+        max_tokens: 2000,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a Job role Guide. Return only valid JSON with no additional text or markdown.",
+          },
+          {
+            role: "user",
+            content: `${promptForJobFit}\n\nJob Title:\n${jobTitle}\n\nJob Description:\n${jobDescription}\n\nResume:\n${parsedText.substring(0, 2500)}`,
+          },
+        ],
+      });
+
+      const rawOutput = completion.choices?.[0]?.message?.content?.trim();
+      if (!rawOutput) return null;
+
+      let aiResult: promptForJobFitResponse;
+      try {
+        let cleanedOutput = rawOutput
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+          .replace(/\\n/g, "\\n")
+          .replace(/\\t/g, "\\t")
+          .replace(/\\r/g, "\\r")
+          .replace(/```json\s*/g, "")
+          .replace(/```\s*/g, "")
+          .trim();
+
+        const jsonStart = cleanedOutput.indexOf("{");
+        const jsonEnd = cleanedOutput.lastIndexOf("}");
+
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
+        }
+
+        const parsedJson = JSON.parse(cleanedOutput);
+        aiResult = promptForJobFitSchema.parse(parsedJson);
+      } catch (parseError) {
+        console.error("Invalid AI response:", rawOutput);
+        console.error("Parse error:", parseError);
+
+        const fallbackResult = extractFallbackData(rawOutput);
+        if (fallbackResult) {
+          aiResult = fallbackResult;
+        } else {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "AI returned invalid response format. Please try again.",
+          });
+        }
+      }
     }),
 });
 

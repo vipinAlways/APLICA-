@@ -4,6 +4,11 @@ export interface ResumeImprovementResponse {
   skills_to_learn: string[];
   field:string
 }
+export interface promptForJobFitResponse {
+  
+  fit_score: number;
+  improvements:string[]
+}
 
 
 export interface PDFParserInstance {
