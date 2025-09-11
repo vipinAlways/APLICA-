@@ -17,7 +17,11 @@ import type {
   ResumeImprovementResponse,
 } from "~/type/types";
 import type { WriteStream } from "fs";
-import { OutputSchema, promptForJobFitSchema, ResumeSchema } from "~/lib/scheama";
+import {
+  OutputSchema,
+  promptForJobFitSchema,
+  ResumeSchema,
+} from "~/lib/scheama";
 import { retryLink } from "@trpc/client";
 
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
@@ -156,7 +160,7 @@ async function cleanupFile(filePath: string): Promise<void> {
   await fs.unlink(filePath);
 }
 
-function extractFallbackData(text: string): ResumeImprovementResponse | null | promptForJobFitResponse {
+function extractFallbackData(text: string): ResumeImprovementResponse | null {
   try {
     const lines = text
       .split("\n")
@@ -280,7 +284,7 @@ export const pdfRoute = createTRPCRouter({
             },
             {
               role: "user",
-              content: `${promptForSuggestions}\n\nResume:\n${parsedText.substring(0, 2500)}`, // Truncate input
+              content: `${promptForSuggestions}\n\nResume:\n${parsedText.substring(0, 4000)}`, // Truncate input
             },
           ],
         });
@@ -337,6 +341,7 @@ export const pdfRoute = createTRPCRouter({
             improvement: aiResult.mistakes_and_suggestions,
             field: aiResult.field || "General",
             Resume: input.pdfUrl,
+            userResumeText: parsedText,
           },
         });
 
@@ -387,7 +392,8 @@ export const pdfRoute = createTRPCRouter({
           id: session.user.id,
         },
         select: {
-          Resume: true,
+          userResumeText: true,
+
         },
       });
 
@@ -398,20 +404,20 @@ export const pdfRoute = createTRPCRouter({
         });
       }
 
-      if (!user.Resume) {
+      if (!user.userResumeText) {
         return null;
       }
 
-      const fileName = uuidv4();
-      const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
+      // const fileName = uuidv4();
+      // const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
 
-      const resumeUrl = user.Resume;
-      await withTimeout(() => streamPdfToFile(resumeUrl, tempFilePath), 20_000);
+      // const resumeUrl = user.Resume;
+      // await withTimeout(() => streamPdfToFile(resumeUrl, tempFilePath), 20_000);
 
-      const parsedText = await withTimeout(
-        () => parsePdf(tempFilePath),
-        15_000,
-      );
+      // const parsedText = await withTimeout(
+      //   () => parsePdf(tempFilePath),
+      //   15_000,
+      // );
       const completion = await client.chat.completions.create({
         model: "Meta-Llama-3.1-8B-Instruct",
         temperature: 0.2,
@@ -424,7 +430,7 @@ export const pdfRoute = createTRPCRouter({
           },
           {
             role: "user",
-            content: `${promptForJobFit}\n\nJob Title:\n${jobTitle}\n\nJob Description:\n${jobDescription}\n\nResume:\n${parsedText.substring(0, 2500)}`,
+            content: `${promptForJobFit}\n\nJob Title:\n${jobTitle}\n\nJob Description:\n${jobDescription}\n\nResume:\n${user.userResumeText}`,
           },
         ],
       });
@@ -458,6 +464,7 @@ export const pdfRoute = createTRPCRouter({
 
         const fallbackResult = extractFallbackData(rawOutput);
         if (fallbackResult) {
+          //TODO:see this one 
           aiResult = fallbackResult;
         } else {
           throw new TRPCError({
@@ -466,6 +473,17 @@ export const pdfRoute = createTRPCRouter({
           });
         }
       }
+    }),
+
+  createEmailAccToJob: publicProcedure
+    .input(
+      z.object({
+        jobrole: z.string(),
+        jobdescription: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { jobdescription, jobrole } = input;
     }),
 });
 

@@ -48,6 +48,7 @@ model User {
     accounts        Account[]
     sessions        Session[]
     Resume          String?
+    userResumeText  String?
     improvement     String[]
     suggestion      String[]
     SuggestedResume String?

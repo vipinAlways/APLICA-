@@ -23,3 +23,14 @@ Rules:
 - "improvements" must be an array of strings. Each string should be one specific suggestion to strengthen the resume or profile.
 - Do not include explanations, markdown, or extra text. Only output valid JSON with the above structure.
 `;
+
+export const promptForProfessionEmail = `
+  You are ab Email expert of writting professional email as per the require role of applying, then return JSON with these exact keys:
+  {
+  "emial":"A fully impersevie email as per the job role and user resume."
+  }
+
+  Rules:
+  -"email" must be looking like a human version so the ai which detects the ai email can not detect fully and must be the string and fully optimize 
+
+`;
