@@ -74,7 +74,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
         <div className="flex w-full items-center gap-1 text-xl">
           <h1>Fit Score</h1>
 
-          {!data ? (
+          {!fitData ? (
             <Button
               onClick={() =>
                 mutate({
@@ -86,23 +86,27 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               Get You Fit Score
             </Button>
           ) : (
-            <p
-              className={cn(
-                "bg-muted-foreground relative flex h-10 w-32 items-center justify-center rounded-lg p-2",
-                "before:absolute before:top-0 before:left-0 before:z-0 before:h-full before:w-[30%] before:rounded-lg before:content-['']",
-                !fitData
-                  ? "hidden"
-                  : fitData.fit_score < 40
-                    ? "before:bg-red-700"
-                    : fitData.fit_score < 80
-                      ? "before:bg-amber-800"
-                      : "before:bg-green-600",
-              )}
-            >
-              <span className="relative z-10 text-white">
-                {fitData && fitData.fit_score}/10{" "}
-              </span>
-            </p>
+            <div>
+              <p
+                className={cn(
+                  "bg-muted-foreground relative flex h-10 w-32 items-center justify-center rounded-lg p-2",
+                  "before:absolute before:top-0 before:left-0 before:z-0 before:h-full before:rounded-lg before:content-['']",
+
+                  !fitData
+                    ? "hidden"
+                    : fitData.fit_score < 40
+                      ? "before:bg-red-700"
+                      : fitData.fit_score < 80
+                        ? "before:bg-amber-800"
+                        : "before:bg-green-600",
+                )}
+              >
+                <span className="relative z-10 text-white">
+                  {fitData && fitData.fit_score}/100{" "}
+                </span>
+              </p>
+              <p>{fitData.improvements}</p>
+            </div>
           )}
         </div>
       ),
