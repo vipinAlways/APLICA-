@@ -30,13 +30,10 @@ export default function LocationSearch({ selected, setSelected }: Props) {
     const filteredData = countryData
       .map((c) => ({
         ...c,
-        cities: c.cities.filter((city) =>
-          city.toLowerCase().includes(lower)
-        ),
+        cities: c.cities.filter((city) => city.toLowerCase().includes(lower)),
       }))
       .filter(
-        (c) =>
-          c.country.toLowerCase().includes(lower) || c.cities.length > 0
+        (c) => c.country.toLowerCase().includes(lower) || c.cities.length > 0,
       );
 
     setFiltered(filteredData);
@@ -46,6 +43,9 @@ export default function LocationSearch({ selected, setSelected }: Props) {
     return <p className="p-4 text-gray-500">Loading...</p>;
   }
 
+  if (!countryData) {
+    return <div>No Data Found</div>;
+  }
   return (
     <div className="mx-auto w-full max-w-lg p-4">
       <input

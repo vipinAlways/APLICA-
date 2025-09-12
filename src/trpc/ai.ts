@@ -159,65 +159,115 @@ async function withTimeout<T>(fn: () => Promise<T>, ms: number): Promise<T> {
 async function cleanupFile(filePath: string): Promise<void> {
   await fs.unlink(filePath);
 }
-
-function extractFallbackData(text: string): ResumeImprovementResponse | null {
+function extractFallbackData(
+  text: string,
+  type: "resume" | "jobfit",
+): ResumeImprovementResponse | promptForJobFitResponse | null {
   try {
     const lines = text
       .split("\n")
       .map((line) => line.trim())
       .filter(Boolean);
 
-    let polished_resume = "";
-    let mistakes_and_suggestions: string[] = [];
-    let skills_to_learn: string[] = [];
-    let field = "";
+    if (type === "resume") {
+      // Original resume improvement logic
+      let polished_resume = "";
+      let mistakes_and_suggestions: string[] = [];
+      let skills_to_learn: string[] = [];
+      let field = "";
+      let currentSection = "";
 
-    let currentSection = "";
+      for (const line of lines) {
+        const lowerLine = line.toLowerCase();
 
-    for (const line of lines) {
-      const lowerLine = line.toLowerCase();
+        if (lowerLine.includes("polished") || lowerLine.includes("improved")) {
+          currentSection = "resume";
+          continue;
+        } else if (
+          lowerLine.includes("mistake") ||
+          lowerLine.includes("suggestion")
+        ) {
+          currentSection = "mistakes";
+          continue;
+        } else if (lowerLine.includes("skill") || lowerLine.includes("learn")) {
+          currentSection = "skills";
+          continue;
+        } else if (lowerLine.includes("field") || lowerLine.includes("role")) {
+          currentSection = "field";
+          continue;
+        }
 
-      if (lowerLine.includes("polished") || lowerLine.includes("improved")) {
-        currentSection = "resume";
-        continue;
-      } else if (
-        lowerLine.includes("mistake") ||
-        lowerLine.includes("suggestion")
+        const cleanLine = line
+          .replace(/^["\-\*\•]\s*/, "")
+          .replace(/[",]$/, "");
+
+        if (currentSection === "resume" && cleanLine.length > 20) {
+          polished_resume += cleanLine + " ";
+        } else if (currentSection === "mistakes" && cleanLine.length > 5) {
+          mistakes_and_suggestions.push(cleanLine);
+        } else if (currentSection === "skills" && cleanLine.length > 3) {
+          skills_to_learn.push(cleanLine);
+        } else if (currentSection === "field" && cleanLine.length > 2) {
+          field = cleanLine;
+        }
+      }
+
+      if (
+        polished_resume.length > 50 &&
+        mistakes_and_suggestions.length > 0 &&
+        skills_to_learn.length > 0
       ) {
-        currentSection = "mistakes";
-        continue;
-      } else if (lowerLine.includes("skill") || lowerLine.includes("learn")) {
-        currentSection = "skills";
-        continue;
-      } else if (lowerLine.includes("field") || lowerLine.includes("role")) {
-        currentSection = "field";
-        continue;
+        return {
+          polished_resume: polished_resume.trim(),
+          mistakes_and_suggestions,
+          skills_to_learn,
+          field: field || "General",
+        };
+      }
+    } else if (type === "jobfit") {
+      // Job fit logic
+      let fit_score = 50; // default
+      let improvements: string[] = [];
+      let currentSection = "";
+
+      for (const line of lines) {
+        const lowerLine = line.toLowerCase();
+
+        if (
+          lowerLine.includes("fit") ||
+          lowerLine.includes("score") ||
+          lowerLine.includes("%")
+        ) {
+          const match = line.match(/(\d+)%?/);
+          if (match && match[1]) {
+            fit_score = parseInt(match[1]);
+          }
+          continue;
+        } else if (
+          lowerLine.includes("improve") ||
+          lowerLine.includes("enhance") ||
+          lowerLine.includes("suggestion") ||
+          lowerLine.includes("recommend")
+        ) {
+          currentSection = "improvements";
+          continue;
+        }
+
+        const cleanLine = line
+          .replace(/^["\-\*\•]\s*/, "")
+          .replace(/[",]$/, "");
+
+        if (currentSection === "improvements" && cleanLine.length > 5) {
+          improvements.push(cleanLine);
+        }
       }
 
-      const cleanLine = line.replace(/^["\-\*\•]\s*/, "").replace(/[",]$/, "");
-
-      if (currentSection === "resume" && cleanLine.length > 20) {
-        polished_resume += cleanLine + " ";
-      } else if (currentSection === "mistakes" && cleanLine.length > 5) {
-        mistakes_and_suggestions.push(cleanLine);
-      } else if (currentSection === "skills" && cleanLine.length > 3) {
-        skills_to_learn.push(cleanLine);
-      } else if (currentSection === "field" && cleanLine.length > 2) {
-        field = cleanLine;
+      if (improvements.length > 0) {
+        return {
+          fit_score,
+          improvements,
+        };
       }
-    }
-
-    if (
-      polished_resume.length > 50 &&
-      mistakes_and_suggestions.length > 0 &&
-      skills_to_learn.length > 0
-    ) {
-      return {
-        polished_resume: polished_resume.trim(),
-        mistakes_and_suggestions,
-        skills_to_learn,
-        field: field || "General",
-      };
     }
 
     return null;
@@ -322,7 +372,10 @@ export const pdfRoute = createTRPCRouter({
           console.error("Invalid AI response:", rawOutput);
           console.error("Parse error:", parseError);
 
-          const fallbackResult = extractFallbackData(rawOutput);
+          const fallbackResult = extractFallbackData(
+            rawOutput,
+            "resume",
+          ) as ResumeImprovementResponse;
           if (fallbackResult) {
             aiResult = fallbackResult;
           } else {
@@ -393,7 +446,6 @@ export const pdfRoute = createTRPCRouter({
         },
         select: {
           userResumeText: true,
-
         },
       });
 
@@ -408,16 +460,6 @@ export const pdfRoute = createTRPCRouter({
         return null;
       }
 
-      // const fileName = uuidv4();
-      // const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
-
-      // const resumeUrl = user.Resume;
-      // await withTimeout(() => streamPdfToFile(resumeUrl, tempFilePath), 20_000);
-
-      // const parsedText = await withTimeout(
-      //   () => parsePdf(tempFilePath),
-      //   15_000,
-      // );
       const completion = await client.chat.completions.create({
         model: "Meta-Llama-3.1-8B-Instruct",
         temperature: 0.2,
@@ -462,9 +504,12 @@ export const pdfRoute = createTRPCRouter({
         console.error("Invalid AI response:", rawOutput);
         console.error("Parse error:", parseError);
 
-        const fallbackResult = extractFallbackData(rawOutput);
+        const fallbackResult = extractFallbackData(
+          rawOutput,
+          "jobfit",
+        ) as promptForJobFitResponse;
         if (fallbackResult) {
-          //TODO:see this one 
+          //TODO:see this one
           aiResult = fallbackResult;
         } else {
           throw new TRPCError({
@@ -473,6 +518,8 @@ export const pdfRoute = createTRPCRouter({
           });
         }
       }
+
+      return aiResult;
     }),
 
   createEmailAccToJob: publicProcedure

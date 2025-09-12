@@ -43,7 +43,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const data: JobCardProps[] = [  
+  const data: JobCardProps[] = [
     {
       employer_name: "TechNova Solutions",
       employer_logo: "https://via.placeholder.com/100x100.png?text=TechNova",
@@ -175,19 +175,21 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                 <span className="font-medium">{job.job_publisher}</span>
               </p>
 
-              <Dialog >
+              <Dialog>
                 <DialogTrigger asChild rel="noopener noreferrer">
                   <Button>Apply Now</Button>
                 </DialogTrigger>
 
-                <DialogContent className="sm:min-w-2xl max-w-sm  h-4/5 flex flex-col gap-4 ">
-                  <DialogHeader className="flex w-full justify-center items-center h-10 ">
-                    <DialogTitle><i>Aplica-</i></DialogTitle>
+                <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-3xl">
+                  <DialogHeader className="flex h-10 w-full items-center justify-center">
+                    <DialogTitle>
+                      <i>Aplica-</i>
+                    </DialogTitle>
                     <DialogDescription>Apply here</DialogDescription>
                   </DialogHeader>
 
-                  <div className="w-full">
-                    <JobContentApply job={job}/>
+                  <div className="">
+                    <JobContentApply job={job} />
                   </div>
                 </DialogContent>
               </Dialog>

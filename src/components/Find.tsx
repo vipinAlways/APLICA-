@@ -96,7 +96,13 @@ const Find = () => {
       Component: (
         <div className="h-full w-full">
           {user.SuggestedResume && url ? (
-            <p>{`${user.SuggestedResume}`}</p>
+            <textarea
+              name="aiResume"
+              id="ai"
+              value={user.SuggestedResume}
+              className="aiResume h-full w-full px-4"
+              disabled
+            ></textarea>
           ) : (
             <p className="text-gray-500">No polished resume yet</p>
           )}
@@ -129,8 +135,8 @@ const Find = () => {
     <div className="flex h-screen w-full items-center justify-center pb-2">
       <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2 max-md:grid-cols-1">
         <div className="sticky top-0 h-full rounded-lg bg-white p-1">
-          <div className="flex h-full flex-col ">
-            <nav className="mb-3 flex gap-3 border-b pb-2 w-full overflow-x-auto">
+          <div className="flex h-full flex-col">
+            <nav className="mb-3 flex w-full gap-3 overflow-x-auto border-b pb-2">
               {navConsts.map((item) => (
                 <button
                   key={item.title}
