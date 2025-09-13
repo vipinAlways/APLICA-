@@ -12,7 +12,7 @@ import UploadResume from "~/components/UploadResume";
 
 const Page = () => {
   return (
-    <div className="h-full px-10">
+    <div className="h-full ">
       <div className="mt-20 flex w-full max-md:flex-col">
         <div className="flex h-96 flex-1 flex-col items-center justify-around p-3 text-xl md:items-start">
           <h1 className="w-full text-2xl font-bold text-wrap max-md:text-center md:text-5xl">

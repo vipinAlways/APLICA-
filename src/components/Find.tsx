@@ -75,7 +75,7 @@ const Find = () => {
       title: "Suggestion",
       Icon: ListStart,
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
+        <div className="h-full w-full overflow-y-auto rounded-lg  p-3">
           {user.suggestion && user.suggestion?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.suggestion.map((m: string, i: number) => (
@@ -114,7 +114,7 @@ const Find = () => {
       title: "Mistakes",
       Icon: X,
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
+        <div className="h-full w-full overflow-y-auto rounded-lg  p-3">
           {user.improvement && user.improvement?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.improvement.map((m: string, i: number) => (
@@ -134,9 +134,9 @@ const Find = () => {
   return (
     <div className="flex h-screen w-full items-center justify-center pb-2">
       <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2 max-md:grid-cols-1">
-        <div className="sticky top-0 h-full rounded-lg bg-white p-1">
+        <div className="sticky top-0 h-full rounded-lg  p-1">
           <div className="flex h-full flex-col">
-            <nav className="mb-3 flex w-full gap-3 overflow-x-auto border-b pb-2">
+            <nav className="mb-3 flex w-full gap-3 overflow-x-auto border-b pb-2 ">
               {navConsts.map((item) => (
                 <button
                   key={item.title}
@@ -152,7 +152,7 @@ const Find = () => {
                 </button>
               ))}
             </nav>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-transparent">
               {navConsts.find((tab) => tab.title === activeTab)?.Component}
             </div>
           </div>

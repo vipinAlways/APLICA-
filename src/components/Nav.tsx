@@ -24,24 +24,36 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 
-import { ChevronDownIcon, CreditCardIcon, LogOut } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  ChevronDownIcon,
+  CreditCardIcon,
+  Loader2,
+  Loader2Icon,
+  LogOut,
+} from "lucide-react";
 import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const Nav = () => {
   const session = useSession();
   const isMobile = useIsMobile();
+  const router = usePathname();
 
   return (
-    <nav className="group w-full">
+    <nav className="group w-full text-zinc-900">
       <div className="flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40">
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
-        <div className="flex w-80 items-center justify-center">
-          {session.data ? (
+        <div className="flex w-80 items-center justify-center gap-1">
+          {session.status === "loading" ? (
+            <Loader2Icon className="size-5 animate-spin border-black" />
+          ) : session.data ? (
             isMobile ? (
               <Drawer>
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
@@ -170,6 +182,13 @@ const Nav = () => {
               </Link>
             </div>
           )}
+          <Link href={"/bookmark"}>
+            {router === "/bookmark" ? (
+              <BookmarkCheck className="size-5" />
+            ) : (
+              <Bookmark className="size-5" />
+            )}
+          </Link>
         </div>
       </div>
     </nav>

@@ -71,9 +71,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       title: "fitScore",
 
       Component: (
-        <div className="flex w-full items-center gap-1 text-xl">
-          <h1>Fit Score</h1>
-
+        <div className="relative flex w-full flex-col items-center gap-1 text-xl">
           {!fitData ? (
             <Button
               onClick={() =>
@@ -86,26 +84,33 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               Get You Fit Score
             </Button>
           ) : (
-            <div>
-              <p
-                className={cn(
-                  "bg-muted-foreground relative flex h-10 w-32 items-center justify-center rounded-lg p-2",
-                  "before:absolute before:top-0 before:left-0 before:z-0 before:h-full before:rounded-lg before:content-['']",
+            <div className="">
+              <div className="sticky top-0 left-0 flex items-center justify-around border-b border-b-black pb-4">
+                <h1 className="font-semibold">Fit Score</h1>
+                <p className="bg-muted-foreground relative flex h-10 w-32 items-center justify-center overflow-hidden rounded-lg p-2">
+                  <span
+                    className={cn(
+                      "absolute top-0 left-0 h-full rounded-lg",
+                      fitData?.fit_score < 40
+                        ? "bg-red-700"
+                        : fitData?.fit_score < 80
+                          ? "bg-amber-800"
+                          : "bg-green-600",
+                    )}
+                    style={{ width: `${fitData?.fit_score ?? 0}%` }}
+                  />
+                  <span className="relative z-10 text-white">
+                    85/100 
 
-                  !fitData
-                    ? "hidden"
-                    : fitData.fit_score < 40
-                      ? "before:bg-red-700"
-                      : fitData.fit_score < 80
-                        ? "before:bg-amber-800"
-                        : "before:bg-green-600",
-                )}
-              >
-                <span className="relative z-10 text-white">
-                  {fitData && fitData.fit_score}/100{" "}
-                </span>
-              </p>
-              <p>{fitData.improvements}</p>
+                    {/* {fitData && fitData.fit_score}  */}
+                  </span>
+                </p>
+
+                <br />
+              </div>
+              {/* <hr className="my-3 h-1 bg-zinc-950" /> */}
+              <p className="mt-3 text-base">Consider adding a separate section for backend experience to highlight Node.js, Express.js, and Prisma skills.Quantify achievements by including metrics or statistics in project descriptions, such as 'Built real-time group music app with 10,000+ users'.Update the education section to include the expected graduation date and any relevant certifications or courses.  </p>
+              {/* {fitData.improvements} */}
             </div>
           )}
         </div>
@@ -139,14 +144,12 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
   ];
-  if (isPending) {
-    return <Loader2Icon className="size-5 animate-spin" />;
-  }
+
   return (
     <div className="w-full space-y-6 p-1">
-      <div className="flex h-96 gap-3">
+      <div className="flex h-96 w-full gap-3">
         {!isMobile && (
-          <div className="flex min-h-80 flex-1 flex-col gap-1 overflow-y-auto text-sm text-wrap md:text-base">
+          <div className="flex min-h-[20rem] flex-1 flex-col gap-1 overflow-y-auto text-sm md:text-base">
             <h1 className="text-2xl font-bold">About Job</h1>
             <h2 className="flex flex-col text-base font-medium lg:text-xl">
               <span className="font-semibold">Role :</span>{" "}
@@ -161,53 +164,16 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
 
             <ul>
               <h1>Qualification</h1>
-              {/* {job.job_highlights.Qualifications.map((highlight:string, index:number) => (
-              <li key={index}>{highlight}</li>
-            ))} */}
+              {/* qualifications mapping here */}
             </ul>
-            <p className="text-wrap break-words">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Reiciendis similique officiis necessitatibus explicabo id pariatur
-              ut illo eum. Rem voluptate quidem rerum aspernatur ut repudiandae
-              eius magni ab odit modi. Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Quas ad, labore atque harum consectetur beatae
-              quae dignissimos repellat iure quisquam maiores autem nihil
-              accusamus quod commodi at obcaecati, soluta eum. Lorem ipsum dolor
-              sit amet consectetur, adipisicing elit. Perferendis distinctio, id
-              inventore porro sit impedit ad cupiditate consequatur, nobis natus
-              laborum aspernatur saepe fuga provident. Illum asperiores quod,
-              laboriosam quis ipsum eaque nemo perspiciatis? Tempore ad porro
-              quod adipisci laboriosam? Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Similique temporibus voluptatibus dolorem vel
-              et, omnis saepe asperiores fugit provident, laudantium pariatur
-              nam sint porro totam distinctio at? Nulla repellat cum impedit
-              quos quae commodi facere laudantium totam, vero natus saepe
-              inventore? Debitis, quisquam similique ducimus sunt et quasi eos
-              esse natus deleniti pariatur odio harum earum dolorum nostrum,
-              laboriosam minima.
+
+            <p className="break-words whitespace-normal text-base">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur vero optio nihil a eaque illo architecto quia consequatur, sunt error amet ducimus sed, laboriosam veritatis laborum nemo cumque eos perspiciatis. Magni deserunt vero amet aperiam omnis soluta voluptates, distinctio incidunt?
             </p>
           </div>
         )}
-        {/* <nav className="mb-3 flex w-full flex-nowrap gap-3 overflow-x-auto border-b pb-2">  
-          {navConsts.map((item, index) => {
-            if (!isMobile && index > 1) {
-              return (
-                <button
-                  key={item.title}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium lg:text-base ${
-                    activeTab === item.title
-                      ? "bg-gray-200 text-black"
-                      : "text-gray-500 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setActiveTab(item.title)}
-                >
-                  {item.title}
-                </button>
-              );
-            }
-          })}
-        </nav> */}
-        <main className="flex h-60 flex-col gap-4 lg:h-96">
+
+        <main className="flex h-60 flex-1 flex-col gap-4 lg:h-96">
           <nav className="mb-3 flex w-full flex-nowrap gap-3 overflow-x-auto border-b pb-2">
             {navConsts.map((item, index) =>
               !isMobile ? (
@@ -239,13 +205,19 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               ),
             )}
           </nav>
-          <section className="w-full flex-1 overflow-x-auto">
+
+          <section className="flex-1 overflow-x-auto">
             <div>
-              {navConsts.find((tab) => tab.title === activeTab)?.Component}
+              {isPending ? (
+                <Loader2Icon className="size-6 animate-spin" />
+              ) : (
+                navConsts.find((tab) => tab.title === activeTab)?.Component
+              )}
             </div>
           </section>
         </main>
       </div>
+
       <footer>
         <Link
           href={job.job_apply_link}

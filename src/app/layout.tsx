@@ -6,6 +6,8 @@ import { Geist } from "next/font/google";
 import { Toaster } from "~/components/ui/sonner";
 import Nav from "~/components/Nav";
 import Provider from "~/components/Provider";
+import Footer from "~/components/Footer";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -22,18 +24,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-<html lang="en" className={`min-h-screen ${geist.variable}`}>
-  <body className=" w-full">
-    <Provider>
-        <Toaster />
-      <main className="w-full  min-h-screen  bg-muted">
-        <Nav />
-        <div className="w-full ">
-          {children}
-        </div>
-      </main>
-    </Provider>
-  </body>
-</html>
+    <html lang="en" className={`min-h-screen ${geist.variable}`}>
+      <body className="relative w-full">
+        <Provider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <main className="bg-zinc-200 backdrop-blur-2xl relative z-20 min-h-screen w-full px-10">
+              <Nav />
+              <div className="w-full">{children}</div>
+            </main>
+
+            <div className="relative z-0 h-screen w-full"></div>
+
+            <Footer  />
+          </ThemeProvider>
+        </Provider>
+      </body>
+    </html>
   );
 }
