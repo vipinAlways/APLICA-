@@ -1,10 +1,11 @@
-import { Loader2Icon } from 'lucide-react'
+
 import React from 'react'
+import Loader from '~/components/Loader'
 
 const loading = () => {
   return (
     <div>
-        <Loader2Icon className='size-14 animate-spin'/>
+        <Loader/>
     </div>
   )
 }

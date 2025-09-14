@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { jsPDF } from "jspdf";
 import { api } from "~/trpc/react";
 import Jobs from "~/components/Jobs";
+import Loader from "./Loader";
 
 const Find = () => {
   const [activeTab, setActiveTab] = useState("Resume");
@@ -45,7 +46,7 @@ const Find = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center">
-        <Loader2 className="size-6 animate-spin" />
+        <Loader />
       </div>
     );
   }

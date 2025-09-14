@@ -130,8 +130,6 @@ label {
   @apply font-semibold text-[#1A1A40];
 }
 
-
-
-.aiResume::-webkit-scrollbar{
+.aiResume::-webkit-scrollbar {
   display: none;
 }

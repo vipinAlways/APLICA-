@@ -1,14 +1,16 @@
+"use client";
 import { Loader2 } from "lucide-react";
-import React, { Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 
-import Find from "~/components/Find";
+
+import Loader from "~/components/Loader";
 import { api } from "~/trpc/server";
+const FindComp = lazy(() => import("~/components/Find"));
 
-const Page = async () => {
-  // await api.user.existingUser.
+const Page = () => {
   return (
-    <Suspense fallback={<Loader2 className="mx-auto size-5 animate-spin" />}>
-      <Find />
+    <Suspense fallback={<Loader/>}>
+      <FindComp />
     </Suspense>
   );
 };

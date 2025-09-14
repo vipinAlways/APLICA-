@@ -8,6 +8,8 @@ import Nav from "~/components/Nav";
 import Provider from "~/components/Provider";
 import Footer from "~/components/Footer";
 import { ThemeProvider } from "next-themes";
+import { Suspense } from "react";
+import Loader from "~/components/Loader";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -27,16 +29,16 @@ export default function RootLayout({
     <html lang="en" className={`min-h-screen ${geist.variable}`}>
       <body className="relative w-full">
         <Provider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <main className="bg-zinc-200 backdrop-blur-2xl relative z-20 min-h-screen w-full px-10">
-              <Nav />
-              <div className="w-full">{children}</div>
-            </main>
+         <Suspense fallback={<Loader/>}>
+           <main className="relative z-20 min-h-screen w-full bg-zinc-200 px-10 backdrop-blur-2xl">
+            <Nav />
+            <div className="w-full">{children}</div>
+          </main>
 
-            <div className="relative z-0 h-screen w-full"></div>
+          <div className="relative z-0 h-screen w-full"></div>
 
-            <Footer  />
-          </ThemeProvider>
+          <Footer />
+         </Suspense>
         </Provider>
       </body>
     </html>
