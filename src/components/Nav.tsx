@@ -38,6 +38,8 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 const Nav = () => {
   const session = useSession();
@@ -182,13 +184,19 @@ const Nav = () => {
               </Link>
             </div>
           )}
-          <Link href={"/bookmark"}>
-            {router === "/bookmark" ? (
-              <BookmarkCheck className="size-5" />
-            ) : (
+          <Dialog>
+            <DialogTrigger>
               <Bookmark className="size-5" />
-            )}
-          </Link>
+            </DialogTrigger>
+
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="mx-auto font-semibold text-lg">
+                  BookMarks
+                </DialogTitle>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </nav>

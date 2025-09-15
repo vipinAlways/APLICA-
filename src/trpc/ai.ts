@@ -22,7 +22,6 @@ import {
   promptForJobFitSchema,
   ResumeSchema,
 } from "~/lib/scheama";
-import { retryLink } from "@trpc/client";
 
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
   const response = await fetch(url);
@@ -70,7 +69,7 @@ async function streamPdfToFile(url: string, destPath: string): Promise<void> {
       }
     };
 
-    fileStream.on("error", reject);
+     fileStream.on("error", reject);
     pump();
   });
 }
@@ -86,7 +85,7 @@ async function parsePdf(filePath: string): Promise<string> {
           new TRPCError({
             code: "BAD_REQUEST",
             message:
-              errData?.parserError || errData?.message || "Failed to parse PDF",
+              errData?.parserError ?? errData?.message ?? "Failed to parse PDF",
           }),
         );
       });
@@ -172,7 +171,7 @@ function extractFallbackData(
     if (type === "resume") {
       // Original resume improvement logic
       let polished_resume = "";
-      let mistakes_and_suggestions: string[] = [];
+      const mistakes_and_suggestions: string[] = [];
       let skills_to_learn: string[] = [];
       let field = "";
       let currentSection = "";
@@ -239,6 +238,7 @@ function extractFallbackData(
           lowerLine.includes("%")
         ) {
           const match = line.match(/(\d+)%?/);
+          //TODO: regax methos
           if (match && match[1]) {
             fit_score = parseInt(match[1]);
           }
@@ -463,7 +463,7 @@ export const pdfRoute = createTRPCRouter({
       const completion = await client.chat.completions.create({
         model: "Meta-Llama-3.1-8B-Instruct",
         temperature: 0.2,
-        max_tokens: 2000,
+        max_tokens: 500,
         messages: [
           {
             role: "system",
@@ -509,7 +509,6 @@ export const pdfRoute = createTRPCRouter({
           "jobfit",
         ) as promptForJobFitResponse;
         if (fallbackResult) {
-          //TODO:see this one
           aiResult = fallbackResult;
         } else {
           throw new TRPCError({

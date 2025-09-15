@@ -96,12 +96,12 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <nav className="w-full max-w-xl">
+      <nav className="w-full max-w-xl flex gap-1.5">
         <Dialog>
           <DialogTrigger className="flex items-center gap-1">
             {query ?? "Query"} <Search className="size-4" />
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-xl">
             <DialogHeader>
               <DialogTitle>Search Job</DialogTitle>
             </DialogHeader>
@@ -180,7 +180,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                   <Button>Apply Now</Button>
                 </DialogTrigger>
 
-                <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-3xl">
+                <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-4xl">
                   <DialogHeader className="flex h-10 w-full items-center justify-center">
                     <DialogTitle>
                       <i>Aplica-</i>

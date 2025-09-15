@@ -10,7 +10,7 @@ import { Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [data, setData] = useState("");
-  const [activeTab, setActiveTab] = useState("fitScore");
+  const [activeTab, setActiveTab] = useState("fitscore");
   const isMobile = useIsMobile();
 
   const {
@@ -68,7 +68,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "fitScore",
+      title: "Fit Score",
 
       Component: (
         <div className="relative flex w-full flex-col items-center gap-1 text-xl">
@@ -99,17 +99,25 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                     )}
                     style={{ width: `${fitData?.fit_score ?? 0}%` }}
                   />
-                  <span className="relative z-10 text-white">
-                    85/100 
-
-                    {/* {fitData && fitData.fit_score}  */}
-                  </span>
+                  {fitData?.fit_score ? (
+                    <span>{fitData.fit_score}</span>
+                  ) : (
+                    <span>-</span>
+                  )}
                 </p>
 
                 <br />
               </div>
-              {/* <hr className="my-3 h-1 bg-zinc-950" /> */}
-              <p className="mt-3 text-base">Consider adding a separate section for backend experience to highlight Node.js, Express.js, and Prisma skills.Quantify achievements by including metrics or statistics in project descriptions, such as 'Built real-time group music app with 10,000+ users'.Update the education section to include the expected graduation date and any relevant certifications or courses.  </p>
+
+              <p className="mt-3 text-base">
+                Consider adding a separate section for backend experience to
+                highlight Node.js, Express.js, and Prisma skills.Quantify
+                achievements by including metrics or statistics in project
+                descriptions, such as 'Built real-time group music app with
+                10,000+ users'.Update the education section to include the
+                expected graduation date and any relevant certifications or
+                courses.{" "}
+              </p>
               {/* {fitData.improvements} */}
             </div>
           )}
@@ -117,7 +125,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "F",
+      title: "Email",
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
           <p className="text-gray-500">No mistakes found 🎉</p>
@@ -125,17 +133,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "Improved Resume",
-
-      Component: (
-        <div className="h-full w-full">
-          <p className="text-gray-500">No polished resume yet</p>
-        </div>
-      ),
-    },
-
-    {
-      title: "Mistakes",
+      title: "Cover Latter",
 
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
@@ -146,29 +144,33 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   ];
 
   return (
-    <div className="w-full space-y-6 p-1">
-      <div className="flex h-96 w-full gap-3">
+    <div className="w-full space-y-10 p-1">
+      <div className="flex h-96 w-full gap-5">
         {!isMobile && (
-          <div className="flex min-h-[20rem] flex-1 flex-col gap-1 overflow-y-auto text-sm md:text-base">
+          <div className="jobs flex min-h-[20rem] flex-1 flex-col gap-1 overflow-y-auto text-sm md:text-base">
             <h1 className="text-2xl font-bold">About Job</h1>
             <h2 className="flex flex-col text-base font-medium lg:text-xl">
-              <span className="font-semibold">Role :</span>{" "}
+              <span className="font-semibold underline">Role :</span>{" "}
               <span>{job.job_title}</span>
             </h2>
             <h4>
               Expected Salary {job.job_salary_min} - {job.job_salary_max}
             </h4>
             <h4>Location &#128205; {job.job_location}</h4>
-
+            <h4 className="font-semibold underline">Description</h4>
             <p>{job.job_description}</p>
 
             <ul>
               <h1>Qualification</h1>
-              {/* qualifications mapping here */}
             </ul>
 
-            <p className="break-words whitespace-normal text-base">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur vero optio nihil a eaque illo architecto quia consequatur, sunt error amet ducimus sed, laboriosam veritatis laborum nemo cumque eos perspiciatis. Magni deserunt vero amet aperiam omnis soluta voluptates, distinctio incidunt?
+            <p className="text-base break-words whitespace-normal">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem
+              ipsum dolor sit amet consectetur adipisicing elit. Consectetur
+              vero optio nihil a eaque illo architecto quia consequatur, sunt
+              error amet ducimus sed, laboriosam veritatis laborum nemo cumque
+              eos perspiciatis. Magni deserunt vero amet aperiam omnis soluta
+              voluptates, distinctio incidunt?
             </p>
           </div>
         )}
@@ -180,12 +182,14 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                 index > 0 && (
                   <button
                     key={item.title}
-                    className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium lg:text-base ${
-                      activeTab === item.title
+                    className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
+                      activeTab === item.title.trim().toLowerCase()
                         ? "bg-gray-200 text-black"
                         : "text-gray-500 hover:bg-gray-100"
                     }`}
-                    onClick={() => setActiveTab(item.title)}
+                    onClick={() =>
+                      setActiveTab(item.title.trim().toLowerCase())
+                    }
                   >
                     {item.title}
                   </button>
@@ -193,12 +197,12 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               ) : (
                 <button
                   key={item.title}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium lg:text-base ${
+                  className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
                     activeTab === item.title
                       ? "bg-gray-200 text-black"
                       : "text-gray-500 hover:bg-gray-100"
                   }`}
-                  onClick={() => setActiveTab(item.title)}
+                  onClick={() => setActiveTab(item.title.trim().toLowerCase())}
                 >
                   {item.title}
                 </button>
@@ -211,7 +215,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               {isPending ? (
                 <Loader2Icon className="size-6 animate-spin" />
               ) : (
-                navConsts.find((tab) => tab.title === activeTab)?.Component
+                navConsts.find(
+                  (tab) => tab.title.trim().toLowerCase() === activeTab,
+                )?.Component
               )}
             </div>
           </section>

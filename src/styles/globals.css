@@ -133,3 +133,10 @@ label {
 .aiResume::-webkit-scrollbar {
   display: none;
 }
+
+/* Example: custom scrollbar for elements with class #jobs */
+.jobs {
+  scrollbar-width: thin;             /* Firefox */
+  scrollbar-color: #10100b rgba(209, 17, 17, 0)    /* Firefox (thumb color + track color) */
+}
+

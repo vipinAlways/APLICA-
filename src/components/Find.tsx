@@ -95,13 +95,13 @@ const Find = () => {
       title: "Improved Resume",
       Icon: FileIcon,
       Component: (
-        <div className="h-full w-full">
+        <div className="h-full w-full p-2">
           {user.SuggestedResume && url ? (
             <textarea
               name="aiResume"
               id="ai"
               value={user.SuggestedResume}
-              className="aiResume h-full w-full px-4"
+              className="aiResume h-full w-full px-4 jobs"
               disabled
             ></textarea>
           ) : (
@@ -153,13 +153,13 @@ const Find = () => {
                 </button>
               ))}
             </nav>
-            <div className="flex-1 overflow-y-auto bg-transparent">
+            <div className="flex-1 overflow-hidden bg-transparent  ">
               {navConsts.find((tab) => tab.title === activeTab)?.Component}
             </div>
           </div>
         </div>
 
-        <div className="h-full flex-1 overflow-y-auto rounded-lg p-2">
+        <div className="h-full flex-1 overflow-y-auto rounded-lg p-2 jobs">
           <Jobs fetchedQuery={user.field ?? ""} />
         </div>
       </div>

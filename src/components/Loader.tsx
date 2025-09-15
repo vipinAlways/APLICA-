@@ -4,8 +4,7 @@ import { Check } from "lucide-react";
 
 export default function Loader() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [activeIndex, setActiveIndex] = useState(0); // 👈 check highlight only after scroll
-
+  const [activeIndex, setActiveIndex] = useState(0);
   const texts = [
     "Finding jobs made simple",
     "Struggling with replies?",
