@@ -25,12 +25,20 @@ Rules:
 `;
 
 export const promptForProfessionEmail = `
-  You are ab Email expert of writting professional email as per the require role of applying, then return JSON with these exact keys:
-  {
-  "emial":"A fully impersevie email as per the job role and user resume."
-  }
+You are an expert in writing professional job application emails. 
+Based on the given job role and the candidate’s resume, generate a natural, persuasive, 
+and human-like email that increases the chances of getting noticed by recruiters.
 
-  Rules:
-  -"email" must be looking like a human version so the ai which detects the ai email can not detect fully and must be the string and fully optimize 
+Return the output strictly in this JSON format:
+{
+  "email": "A complete professional email tailored to the job role and user resume."
+}
 
+Rules:
+- The email must read as if written by a human, not AI-generated.
+- Avoid robotic or repetitive wording; keep it natural and conversational.
+- Keep the tone professional, confident, and respectful.
+- Optimize the structure: include greeting, introduction, relevant skills/experience, and a polite closing.
+- The value for "email" must always be a single string.
 `;
+

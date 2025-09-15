@@ -10,7 +10,7 @@ import { Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [data, setData] = useState("");
-  const [activeTab, setActiveTab] = useState("fitscore");
+  const [activeTab, setActiveTab] = useState("fit score");
   const isMobile = useIsMobile();
 
   const {
@@ -21,7 +21,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     mutationKey: ["getFitScore"],
     onSuccess: () => toast("here what you want"),
   });
-
+  console.log(fitData?.fit_score);
   const navConsts = [
     {
       title: "aboutJob",
@@ -73,21 +73,24 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       Component: (
         <div className="relative flex w-full flex-col items-center gap-1 text-xl">
           {!fitData ? (
-            <Button
-              onClick={() =>
-                mutate({
-                  jobTitle: job.job_title,
-                  jobDescription: job.job_description,
-                })
-              }
-            >
-              Get You Fit Score
-            </Button>
+            <div className="w-full">
+              <Button
+                onClick={() =>
+                  mutate({
+                    jobTitle: job.job_title,
+                    jobDescription: job.job_description,
+                  })
+                }
+              >
+                Get You Fit Score
+              </Button>
+            </div>
           ) : (
             <div className="">
               <div className="sticky top-0 left-0 flex items-center justify-around border-b border-b-black pb-4">
                 <h1 className="font-semibold">Fit Score</h1>
                 <p className="bg-muted-foreground relative flex h-10 w-32 items-center justify-center overflow-hidden rounded-lg p-2">
+                  {/* Progress Bar */}
                   <span
                     className={cn(
                       "absolute top-0 left-0 h-full rounded-lg",
@@ -99,10 +102,12 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                     )}
                     style={{ width: `${fitData?.fit_score ?? 0}%` }}
                   />
+
+                  {/* Score text (always visible) */}
                   {fitData?.fit_score ? (
-                    <span>{fitData.fit_score}</span>
+                    <span className="relative z-10 text-zinc-200">{fitData.fit_score}/100</span>
                   ) : (
-                    <span>-</span>
+                    <span className="relative z-10">-</span>
                   )}
                 </p>
 
@@ -142,7 +147,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
   ];
-
+  console.log(activeTab, "ye");
   return (
     <div className="w-full space-y-10 p-1">
       <div className="flex h-96 w-full gap-5">
