@@ -140,3 +140,7 @@ label {
   scrollbar-color: #10100b rgba(209, 17, 17, 0)    /* Firefox (thumb color + track color) */
 }
 
+.mail::-webkit-scrollbar {
+  display: none;           /* Firefox */
+}
+

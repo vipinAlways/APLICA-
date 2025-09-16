@@ -143,7 +143,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     {
       title: "Email",
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
+        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
           {!emaildata ? (
             <Button
               onClick={() =>
@@ -155,17 +155,19 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             >
               Generate Email
             </Button>
+          ) : ispendingEmail ? (
+            <Loader2Icon className="mx-auto size-6 animate-spin" />
           ) : (
             <textarea
               name="email"
               id="email"
-              value={(emaildata && emaildata.email) ?? ""}
+              value={(emaildata && emaildata.parsed.email) ?? ""}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-full w-full"
+              className="mail h-80 w-full overflow-y-auto rounded-md p-1"
             ></textarea>
           )}
 
-          <p className="text-gray-500">No Data found 🎉</p>
+          {/* <p className="text-gray-500">No Data found 🎉</p> */}
         </div>
       ),
     },
@@ -273,6 +275,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
         <Link
           href={job.job_apply_link}
           className="bg-secondary-foreground text-secondary rounded-md p-2"
+          target="_blank"
         >
           Apply here
         </Link>

@@ -369,9 +369,9 @@ export const pdfRoute = createTRPCRouter({
       const session = await auth();
 
       if (!session) {
-        new TRPCError({
-          code: "NOT_FOUND",
-          message: "user is not authenticate",
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User is not authenticated",
         });
       }
 
@@ -383,12 +383,14 @@ export const pdfRoute = createTRPCRouter({
           userResumeText: true,
         },
       });
+
       if (!user) {
-        new TRPCError({
+        throw new TRPCError({
           code: "NOT_FOUND",
-          message: "user is not authenticate in server",
+          message: "User not found in server",
         });
       }
+
       const completion = await client.chat.completions.create({
         model: "Meta-Llama-3.1-8B-Instruct",
         temperature: 0.2,
@@ -396,8 +398,10 @@ export const pdfRoute = createTRPCRouter({
         messages: [
           {
             role: "system",
-            content:
-              "You are a Job role Guide. Return only valid JSON with no additional text or markdown.",
+            content: `You are a Job role Guide.
+Return only valid JSON. 
+Do not include markdown, extra text, or formatting. 
+Escape all special characters properly inside strings (e.g. newlines as \\n).`,
           },
           {
             role: "user",
@@ -409,25 +413,29 @@ export const pdfRoute = createTRPCRouter({
       const rawOutput = completion.choices?.[0]?.message?.content?.trim();
       if (!rawOutput) return null;
 
-      let aiResult: promptForEmailResponse;
+      let aiResult: promptForEmailResponse | null = null;
+
       try {
         let cleanedOutput = rawOutput
-          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
-          .replace(/\\n/g, "\\n")
-          .replace(/\\t/g, "\\t")
-          .replace(/\\r/g, "\\r")
           .replace(/```json\s*/g, "")
           .replace(/```\s*/g, "")
           .trim();
 
+        // extract only JSON portion if there is extra text
         const jsonStart = cleanedOutput.indexOf("{");
         const jsonEnd = cleanedOutput.lastIndexOf("}");
-
         if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
           cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
         }
 
-        const parsedJson = JSON.parse(cleanedOutput);
+        // sanitize control characters
+        let safeOutput = cleanedOutput
+          .replace(/[\x00-\x1F\x7F]/g, "") // strip invalid ASCII
+          .replace(/(?<!\\)\n/g, "\\n") // escape raw newlines
+          .replace(/(?<!\\)\r/g, "\\r")
+          .replace(/(?<!\\)\t/g, "\\t");
+
+        const parsedJson = JSON.parse(safeOutput);
         aiResult = promptForEmailSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
@@ -437,6 +445,7 @@ export const pdfRoute = createTRPCRouter({
           rawOutput,
           "jobemail",
         ) as promptForEmailResponse;
+
         if (fallbackResult) {
           aiResult = fallbackResult;
         } else {
@@ -447,8 +456,12 @@ export const pdfRoute = createTRPCRouter({
         }
       }
 
-      return aiResult;
+      // return both versions: raw + structured
+      return {
+        parsed: aiResult, // structured JSON
+      };
     }),
+
   createCoverLetter: publicProcedure
     .input(
       z.object({
@@ -489,8 +502,10 @@ export const pdfRoute = createTRPCRouter({
         messages: [
           {
             role: "system",
-            content:
-              "You are a Job role Guide. Return only valid JSON with no additional text or markdown.",
+            content: `You are a Job role Guide.
+Return only valid JSON. 
+Do not include markdown, extra text, or formatting. 
+Escape all special characters properly inside strings (e.g. newlines as \\n)..`,
           },
           {
             role: "user",
