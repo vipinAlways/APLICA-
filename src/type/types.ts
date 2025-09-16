@@ -2,17 +2,24 @@ export interface ResumeImprovementResponse {
   polished_resume: string;
   mistakes_and_suggestions: string[];
   skills_to_learn: string[];
-  field:string
+  field: string;
 }
 export interface promptForJobFitResponse {
-  
   fit_score: number;
-  improvements:string[]
+  improvements: string[];
+}
+export interface promptForEmailResponse {
+  email: string;
+}
+export interface promptForCoverLetterResponse {
+  coverLetter: string;
 }
 
-
 export interface PDFParserInstance {
-  on(event: "pdfParser_dataError", listener: (errData: PDFParserError) => void): void;
+  on(
+    event: "pdfParser_dataError",
+    listener: (errData: PDFParserError) => void,
+  ): void;
   on(event: "pdfParser_dataReady", listener: () => void): void;
   getRawTextContent(): string;
   loadPDF(filePath: string): void;

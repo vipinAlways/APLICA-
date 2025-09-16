@@ -5,6 +5,8 @@ import type {
   PDFParserConstructor,
   PDFParserError,
   PDFParserInstance,
+  promptForCoverLetterResponse,
+  promptForEmailResponse,
   promptForJobFitResponse,
   ResumeImprovementResponse,
 } from "~/type/types";
@@ -69,8 +71,13 @@ export async function parsePdf(filePath: string): Promise<string> {
 
 export function extractFallbackData(
   text: string,
-  type: "resume" | "jobfit" | "jobemail",
-): ResumeImprovementResponse | promptForJobFitResponse | null {
+  type: "resume" | "jobfit" | "jobemail" | "coverletter",
+):
+  | ResumeImprovementResponse
+  | promptForJobFitResponse
+  | promptForEmailResponse
+  | promptForCoverLetterResponse
+  | null {
   try {
     const lines = text
       .split("\n")
@@ -148,7 +155,7 @@ export function extractFallbackData(
         ) {
           const match = line.match(/(\d+)%?/);
           //TODO: regax methos
-          if (match && match[1]) {
+          if (match?.[1]) {
             fit_score = parseInt(match[1]);
           }
           continue;
@@ -179,7 +186,40 @@ export function extractFallbackData(
       }
     } else if (type === "jobemail") {
       let email = "";
-      //TODO:ye chek karna hain 
+
+      for (const line of lines) {
+        const cleanLine = line
+          .replace(/^["\-\*\•]\s*/, "")
+          .replace(/[",]$/, "");
+
+        if (cleanLine.length > 5) {
+          email += cleanLine + " ";
+        }
+      }
+
+      if (email.length > 50) {
+        return {
+          email: email,
+        };
+      }
+    } else if (type === "coverletter") {
+      let coverLetter = "";
+
+      for (const line of lines) {
+        const cleanLine = line
+          .replace(/^["\-\*\•]\s*/, "")
+          .replace(/[",]$/, "");
+
+        if (cleanLine.length > 5) {
+          coverLetter += cleanLine + " ";
+        }
+      }
+
+      if (coverLetter.length > 50) {
+        return {
+          coverLetter: coverLetter,
+        };
+      }
     }
 
     return null;

@@ -10,18 +10,30 @@ import { Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [data, setData] = useState("");
+  const [email, setEmail] = useState("");
+  const [coverLetter, setCoverLetter] = useState("");
   const [activeTab, setActiveTab] = useState("fit score");
   const isMobile = useIsMobile();
 
   const {
-    mutate,
+    mutate: fitScoreMutate,
     isPending,
     data: fitData,
   } = api.pdfRoute.AccordingToJob.useMutation({
     mutationKey: ["getFitScore"],
     onSuccess: () => toast("here what you want"),
   });
-  console.log(fitData?.fit_score);
+  const {
+    mutate: emailMutate,
+    isPending: ispendingEmail,
+    data: emaildata,
+  } = api.pdfRoute.createEmailAccToJob.useMutation({
+    mutationKey: ["getEmail", job.job_title, job.job_description],
+    onSuccess: () => {
+      toast("here what you want");
+    },
+  });
+
   const navConsts = [
     {
       title: "aboutJob",
@@ -69,14 +81,13 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     },
     {
       title: "Fit Score",
-
       Component: (
         <div className="relative flex w-full flex-col items-center gap-1 text-xl">
           {!fitData ? (
             <div className="w-full">
               <Button
                 onClick={() =>
-                  mutate({
+                  fitScoreMutate({
                     jobTitle: job.job_title,
                     jobDescription: job.job_description,
                   })
@@ -90,7 +101,6 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               <div className="sticky top-0 left-0 flex items-center justify-around border-b border-b-black pb-4">
                 <h1 className="font-semibold">Fit Score</h1>
                 <p className="bg-muted-foreground relative flex h-10 w-32 items-center justify-center overflow-hidden rounded-lg p-2">
-                  {/* Progress Bar */}
                   <span
                     className={cn(
                       "absolute top-0 left-0 h-full rounded-lg",
@@ -103,9 +113,10 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                     style={{ width: `${fitData?.fit_score ?? 0}%` }}
                   />
 
-                  {/* Score text (always visible) */}
                   {fitData?.fit_score ? (
-                    <span className="relative z-10 text-zinc-200">{fitData.fit_score}/100</span>
+                    <span className="relative z-10 text-zinc-200">
+                      {fitData.fit_score}/100
+                    </span>
                   ) : (
                     <span className="relative z-10">-</span>
                   )}
@@ -133,7 +144,28 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       title: "Email",
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
-          <p className="text-gray-500">No mistakes found 🎉</p>
+          {!emaildata ? (
+            <Button
+              onClick={() =>
+                emailMutate({
+                  jobdescription: job.job_description,
+                  jobrole: job.job_title,
+                })
+              }
+            >
+              Generate Email
+            </Button>
+          ) : (
+            <textarea
+              name="email"
+              id="email"
+              value={(emaildata && emaildata.email) ?? ""}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-full w-full"
+            ></textarea>
+          )}
+
+          <p className="text-gray-500">No Data found 🎉</p>
         </div>
       ),
     },
@@ -142,7 +174,15 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
 
       Component: (
         <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
-          <p className="text-gray-500">No mistakes found 🎉</p>
+          <Button>Generate Email</Button>
+          <textarea
+            name="coverLetter"
+            id="coverLetter"
+            value={coverLetter}
+            onChange={(e) => setCoverLetter(e.target.value)}
+          ></textarea>
+
+          <p className="text-gray-500">No Data found 🎉</p>
         </div>
       ),
     },

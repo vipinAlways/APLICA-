@@ -26,8 +26,8 @@ Rules:
 
 export const promptForProfessionEmail = `
 You are an expert in writing professional job application emails. 
-Based on the given job role and the candidate’s resume, generate a natural, persuasive, 
-and human-like email that increases the chances of getting noticed by recruiters.
+Based on the given job role and the candidate's resume, generate a natural, persuasive, 
+and human-like email that increases the chances of getting noticed by recruiters. With the proper format like mention subject and mail
 
 Return the output strictly in this JSON format:
 {
@@ -41,4 +41,20 @@ Rules:
 - Optimize the structure: include greeting, introduction, relevant skills/experience, and a polite closing.
 - The value for "email" must always be a single string.
 `;
+export const promptForProfessionCoverLetter = `
+You are an expert in writing professional job application cover letter. 
+Based on the given job role and the candidate's resume, generate a natural, persuasive, 
+and human-like email that increases the chances of getting noticed by recruiters. With the proper format like mention subject and mail
 
+Return the output strictly in this JSON format:
+{
+  "coverLetter": "A complete professional Cover Letter tailored to the job role and user resume."
+}
+
+Rules:
+- The cover letter must read as if written by a human, not AI-generated.
+- Avoid robotic or repetitive wording; keep it natural and conversational.
+- Keep the tone professional, confident, and respectful.
+- Optimize the structure: include greeting, introduction, relevant skills/experience, and a polite closing.
+- The value for "coverLetter" must always be a single string.
+`;

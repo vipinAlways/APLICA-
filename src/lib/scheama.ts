@@ -21,3 +21,9 @@ export const promptForJobFitSchema = z.object({
   fit_score: z.number(),
   improvements: z.array(z.string()).min(1, "Must have at least one suggestion"),
 });
+export const promptForEmailSchema = z.object({
+  email: z.string(),
+});
+export const promptForCoverLetterSchema = z.object({
+  coverLetter: z.string(),
+});

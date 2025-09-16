@@ -8,6 +8,7 @@ import path from "path";
 import { client } from "~/lib/Ai";
 import {
   promptForJobFit,
+  promptForProfessionCoverLetter,
   promptForProfessionEmail,
   promptForSuggestions,
 } from "~/lib/const";
@@ -17,12 +18,16 @@ import type {
   PDFParserConstructor,
   PDFParserError,
   PDFParserInstance,
+  promptForCoverLetterResponse,
+  promptForEmailResponse,
   promptForJobFitResponse,
   ResumeImprovementResponse,
 } from "~/type/types";
 import type { WriteStream } from "fs";
 import {
   OutputSchema,
+  promptForCoverLetterSchema,
+  promptForEmailSchema,
   promptForJobFitSchema,
   ResumeSchema,
 } from "~/lib/scheama";
@@ -404,7 +409,7 @@ export const pdfRoute = createTRPCRouter({
       const rawOutput = completion.choices?.[0]?.message?.content?.trim();
       if (!rawOutput) return null;
 
-      let aiResult: promptForJobFitResponse;
+      let aiResult: promptForEmailResponse;
       try {
         let cleanedOutput = rawOutput
           .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
@@ -423,7 +428,7 @@ export const pdfRoute = createTRPCRouter({
         }
 
         const parsedJson = JSON.parse(cleanedOutput);
-        aiResult = promptForJobFitSchema.parse(parsedJson);
+        aiResult = promptForEmailSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
         console.error("Parse error:", parseError);
@@ -431,7 +436,100 @@ export const pdfRoute = createTRPCRouter({
         const fallbackResult = extractFallbackData(
           rawOutput,
           "jobemail",
-        ) as promptForJobFitResponse;
+        ) as promptForEmailResponse;
+        if (fallbackResult) {
+          aiResult = fallbackResult;
+        } else {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "AI returned invalid response format. Please try again.",
+          });
+        }
+      }
+
+      return aiResult;
+    }),
+  createCoverLetter: publicProcedure
+    .input(
+      z.object({
+        jobrole: z.string(),
+        jobdescription: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { jobdescription, jobrole } = input;
+
+      const session = await auth();
+
+      if (!session) {
+        new TRPCError({
+          code: "NOT_FOUND",
+          message: "user is not authenticate",
+        });
+      }
+
+      const user = await ctx.db.user.findFirst({
+        where: {
+          id: session?.user.id,
+        },
+        select: {
+          userResumeText: true,
+        },
+      });
+      if (!user) {
+        new TRPCError({
+          code: "NOT_FOUND",
+          message: "user is not authenticate in server",
+        });
+      }
+      const completion = await client.chat.completions.create({
+        model: "Meta-Llama-3.1-8B-Instruct",
+        temperature: 0.2,
+        max_tokens: 500,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a Job role Guide. Return only valid JSON with no additional text or markdown.",
+          },
+          {
+            role: "user",
+            content: `${promptForProfessionCoverLetter}\n\nJob Title:\n${jobrole}\n\nJob Description:\n${jobdescription}\n\nResume:\n${user?.userResumeText ?? ""}`,
+          },
+        ],
+      });
+
+      const rawOutput = completion.choices?.[0]?.message?.content?.trim();
+      if (!rawOutput) return null;
+
+      let aiResult: promptForCoverLetterResponse;
+      try {
+        let cleanedOutput = rawOutput
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+          .replace(/\\n/g, "\\n")
+          .replace(/\\t/g, "\\t")
+          .replace(/\\r/g, "\\r")
+          .replace(/```json\s*/g, "")
+          .replace(/```\s*/g, "")
+          .trim();
+
+        const jsonStart = cleanedOutput.indexOf("{");
+        const jsonEnd = cleanedOutput.lastIndexOf("}");
+
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
+        }
+
+        const parsedJson = JSON.parse(cleanedOutput);
+        aiResult = promptForCoverLetterSchema.parse(parsedJson);
+      } catch (parseError) {
+        console.error("Invalid AI response:", rawOutput);
+        console.error("Parse error:", parseError);
+
+        const fallbackResult = extractFallbackData(
+          rawOutput,
+          "coverletter",
+        ) as promptForCoverLetterResponse;
         if (fallbackResult) {
           aiResult = fallbackResult;
         } else {
