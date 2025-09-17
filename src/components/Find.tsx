@@ -65,6 +65,7 @@ const Find = () => {
               src={user.Resume}
               className="h-full w-full rounded-xl"
               frameBorder={0}
+              loading="lazy"
             />
           ) : (
             <p>No resume uploaded</p>
@@ -76,7 +77,7 @@ const Find = () => {
       title: "Suggestion",
       Icon: ListStart,
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg  p-3">
+        <div className="h-full w-full overflow-y-auto rounded-lg p-3">
           {user.suggestion && user.suggestion?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.suggestion.map((m: string, i: number) => (
@@ -101,7 +102,7 @@ const Find = () => {
               name="aiResume"
               id="ai"
               value={user.SuggestedResume}
-              className="aiResume h-full w-full px-4 jobs"
+              className="aiResume jobs h-full w-full px-4"
               disabled
             ></textarea>
           ) : (
@@ -115,7 +116,7 @@ const Find = () => {
       title: "Mistakes",
       Icon: X,
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg  p-3">
+        <div className="h-full w-full overflow-y-auto rounded-lg p-3">
           {user.improvement && user.improvement?.length > 0 ? (
             <ul className="list-disc space-y-2 pl-5">
               {user.improvement.map((m: string, i: number) => (
@@ -135,9 +136,9 @@ const Find = () => {
   return (
     <div className="flex h-screen w-full items-center justify-center pb-2">
       <div className="relative grid h-full w-full grid-cols-2 gap-5 px-2 max-md:grid-cols-1">
-        <div className="sticky top-0 h-full rounded-lg  p-1">
+        <div className="sticky top-0 h-full rounded-lg p-1">
           <div className="flex h-full flex-col">
-            <nav className="mb-3 flex w-full gap-3 overflow-x-auto border-b pb-2 ">
+            <nav className="mb-3 flex w-full gap-3 overflow-x-auto border-b pb-2">
               {navConsts.map((item) => (
                 <button
                   key={item.title}
@@ -153,13 +154,13 @@ const Find = () => {
                 </button>
               ))}
             </nav>
-            <div className="flex-1 overflow-hidden bg-transparent  ">
+            <div className="flex-1 overflow-hidden bg-transparent">
               {navConsts.find((tab) => tab.title === activeTab)?.Component}
             </div>
           </div>
         </div>
 
-        <div className="h-full flex-1 overflow-y-auto rounded-lg p-2 jobs">
+        <div className="jobs h-full flex-1 overflow-y-auto rounded-lg p-2">
           <Jobs fetchedQuery={user.field ?? ""} />
         </div>
       </div>

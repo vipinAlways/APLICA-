@@ -88,6 +88,7 @@ const UploadResume = () => {
                 : user.Resume!
             }
             className="h-72 w-4/5 rounded-md"
+            loading="lazy"
           />
         </div>
 
@@ -142,7 +143,7 @@ const UploadResume = () => {
           )}
         </Dropzone>
 
-        {/* Continue button */}
+       
         <div className="mt-4">
           <Button
             onClick={handleContinue}

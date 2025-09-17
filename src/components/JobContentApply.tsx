@@ -6,15 +6,15 @@ import { Button } from "./ui/button";
 import { useIsMobile } from "~/hooks/use-mobile";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
+import { Copy, CopyCheck, CopyIcon, Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [data, setData] = useState("");
   const [email, setEmail] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
-  const [activeTab, setActiveTab] = useState("fit score");
+  const [activeTab, setActiveTab] = useState("fitscore"); // normalized default
   const isMobile = useIsMobile();
-
+  const [copied, setCopied] = useState(false);
   const {
     mutate: fitScoreMutate,
     isPending,
@@ -23,6 +23,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     mutationKey: ["getFitScore"],
     onSuccess: () => toast("here what you want"),
   });
+
   const {
     mutate: emailMutate,
     isPending: ispendingEmail,
@@ -30,13 +31,32 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   } = api.pdfRoute.createEmailAccToJob.useMutation({
     mutationKey: ["getEmail", job.job_title, job.job_description],
     onSuccess: () => {
-      toast("here what you want");
+      setEmail(emaildata?.parsed.email!);
+      toast("Here is your Email");
     },
   });
 
+  const {
+    mutate: coverLetterMutate,
+    isPending: ispendingCoverletter,
+    data: coverLetterData,
+  } = api.pdfRoute.createCoverLetter.useMutation({
+    mutationKey: ["getCoverLetter", job.job_title, job.job_description],
+    onSuccess: () => {
+      toast("Here is your cover letter");
+    },
+  });
+  const handleCopy = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+
+    setCopied(true);
+    toast("Copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const navConsts = [
     {
-      title: "aboutJob",
+      title: "aboutjob",
       Component: (
         <div className="flex h-80 flex-1 flex-col gap-1 overflow-y-auto text-sm text-wrap md:text-base">
           <h1 className="flex flex-col text-base font-medium lg:text-xl">
@@ -80,9 +100,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "Fit Score",
+      title: "fitscore",
       Component: (
-        <div className="relative flex w-full flex-col items-center gap-1 text-xl">
+        <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
           {!fitData ? (
             <div className="w-full">
               <Button
@@ -113,7 +133,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                     style={{ width: `${fitData?.fit_score ?? 0}%` }}
                   />
 
-                  {fitData?.fit_score ? (
+                  {isPending ? (
+                    <Loader2Icon className="absolute left-1/2 -translate-x-1/2 animate-spin" />
+                  ) : fitData?.fit_score ? (
                     <span className="relative z-10 text-zinc-200">
                       {fitData.fit_score}/100
                     </span>
@@ -141,9 +163,22 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "Email",
+      title: "email",
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
+        <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
+          <Button
+            onClick={() => {
+              if (!email) {
+                toast("Empty Email!");
+                return;
+              }
+
+              handleCopy(email);
+            }}
+            className="absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
+          >
+            {copied ? <CopyCheck /> : <Copy />}
+          </Button>
           {!emaildata ? (
             <Button
               onClick={() =>
@@ -152,6 +187,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                   jobrole: job.job_title,
                 })
               }
+              disabled={ispendingEmail}
             >
               Generate Email
             </Button>
@@ -172,24 +208,52 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       ),
     },
     {
-      title: "Cover Latter",
-
+      title: "coverletter",
       Component: (
-        <div className="h-full w-full overflow-y-auto rounded-lg bg-white p-3">
-          <Button>Generate Email</Button>
-          <textarea
-            name="coverLetter"
-            id="coverLetter"
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-          ></textarea>
+        <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
+          <Button
+            onClick={() => {
+              if (!coverLetterData?.coverLetter) {
+                toast("Empty cover Letter!");
+                return;
+              }
 
-          <p className="text-gray-500">No Data found 🎉</p>
+              handleCopy(coverLetter);
+            }}
+            className="absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
+          >
+            {copied ? <CopyCheck /> : <Copy />}
+          </Button>
+          {!coverLetterData ? (
+            <Button
+              onClick={() =>
+                coverLetterMutate({
+                  jobdescription: job.job_description,
+                  jobrole: job.job_title,
+                })
+              }
+              disabled={ispendingCoverletter}
+            >
+              Generate Cover Letter
+            </Button>
+          ) : ispendingCoverletter ? (
+            <Loader2Icon className="mx-auto size-6 animate-spin" />
+          ) : (
+            <textarea
+              name="coverLetter"
+              id="coverLetter"
+              value={(coverLetterData && coverLetterData.coverLetter) ?? ""}
+              onChange={(e) => setCoverLetter(e.target.value)}
+              className="mail h-80 w-full overflow-y-auto rounded-md p-1"
+            ></textarea>
+          )}
         </div>
       ),
     },
   ];
-  console.log(activeTab, "ye");
+
+  const tabsToShow = isMobile ? navConsts : navConsts.slice(1);
+
   return (
     <div className="w-full space-y-10 p-1">
       <div className="flex h-96 w-full gap-5">
@@ -224,48 +288,24 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
 
         <main className="flex h-60 flex-1 flex-col gap-4 lg:h-96">
           <nav className="mb-3 flex w-full flex-nowrap gap-3 overflow-x-auto border-b pb-2">
-            {navConsts.map((item, index) =>
-              !isMobile ? (
-                index > 0 && (
-                  <button
-                    key={item.title}
-                    className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
-                      activeTab === item.title.trim().toLowerCase()
-                        ? "bg-gray-200 text-black"
-                        : "text-gray-500 hover:bg-gray-100"
-                    }`}
-                    onClick={() =>
-                      setActiveTab(item.title.trim().toLowerCase())
-                    }
-                  >
-                    {item.title}
-                  </button>
-                )
-              ) : (
-                <button
-                  key={item.title}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
-                    activeTab === item.title
-                      ? "bg-gray-200 text-black"
-                      : "text-gray-500 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setActiveTab(item.title.trim().toLowerCase())}
-                >
-                  {item.title}
-                </button>
-              ),
-            )}
+            {tabsToShow.map((item) => (
+              <button
+                key={item.title}
+                className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
+                  activeTab === item.title
+                    ? "bg-gray-200 text-black"
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+                onClick={() => setActiveTab(item.title)}
+              >
+                {item.title}
+              </button>
+            ))}
           </nav>
 
           <section className="flex-1 overflow-x-auto">
             <div>
-              {isPending ? (
-                <Loader2Icon className="size-6 animate-spin" />
-              ) : (
-                navConsts.find(
-                  (tab) => tab.title.trim().toLowerCase() === activeTab,
-                )?.Component
-              )}
+              {navConsts.find((tab) => tab.title === activeTab)?.Component}
             </div>
           </section>
         </main>

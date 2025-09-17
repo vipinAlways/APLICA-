@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`min-h-screen ${geist.variable}`}>
       <body className="relative w-full">
-        <Provider>
-          <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loader />}>
+          <Provider>
             <Toaster />
             <main className="relative z-20 min-h-screen w-full bg-zinc-200 px-10 backdrop-blur-2xl">
               <Nav />
@@ -36,8 +36,8 @@ export default function RootLayout({
             <div className="relative z-0 h-52 w-full"></div>
 
             <Footer />
-          </Suspense>
-        </Provider>
+          </Provider>
+        </Suspense>
       </body>
     </html>
   );
