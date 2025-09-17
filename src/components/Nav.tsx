@@ -26,10 +26,8 @@ import {
 
 import {
   Bookmark,
-  BookmarkCheck,
   ChevronDownIcon,
   CreditCardIcon,
-  Loader2,
   Loader2Icon,
   LogOut,
 } from "lucide-react";
@@ -37,14 +35,18 @@ import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./ui/dialog";
+import { usePathname } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "./ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
 const Nav = () => {
   const session = useSession();
   const isMobile = useIsMobile();
-  const router = usePathname();
 
   return (
     <nav className="group w-full text-zinc-900">
@@ -191,7 +193,7 @@ const Nav = () => {
 
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle className="mx-auto font-semibold text-lg">
+                <DialogTitle className="mx-auto text-lg font-semibold">
                   BookMarks
                 </DialogTitle>
               </DialogHeader>

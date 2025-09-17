@@ -1,7 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { createWriteStream, promises as fs } from "fs";
 import { v4 as uuidv4 } from "uuid";
-import PDFParser from "pdf2json";
 import { z } from "zod";
 import os from "os";
 import path from "path";
@@ -15,9 +14,6 @@ import {
 import { auth } from "~/server/auth";
 import { TRPCError } from "@trpc/server";
 import type {
-  PDFParserConstructor,
-  PDFParserError,
-  PDFParserInstance,
   promptForCoverLetterResponse,
   promptForEmailResponse,
   promptForJobFitResponse,
@@ -31,7 +27,6 @@ import {
   promptForJobFitSchema,
   ResumeSchema,
 } from "~/lib/scheama";
-import { redirect } from "next/dist/server/api-utils";
 import { extractFallbackData, parsePdf } from "~/utils/helper";
 
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
