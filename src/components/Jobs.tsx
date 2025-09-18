@@ -1,7 +1,6 @@
 "use client";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { api } from "~/trpc/react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { MapPin, DollarSign, Building } from "lucide-react";
@@ -17,11 +16,13 @@ import {
 import type { JobCardProps } from "~/type/types";
 import LocationSearch from "./LocationSearch";
 import JobContentApply from "./JobContentApply";
+import Image from "next/image";
 
 const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [query, setQuery] = useState(fetchedQuery);
   const [debounceQuery, setDebounceQuery] = useState(fetchedQuery);
   const [selected, setSelected] = useState("");
+  const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [dataHold, setDataHold] = useState<JobCardProps[]>([]);
   const [country, setCountry] = useState("");
@@ -29,7 +30,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   // const { data, isLoading, isFetching } = api.getjobs.getJobs.useQuery(
   //   {
   //     query: debounceQuery,
-  //     country,
+  //     selected,
   //     page,
   //   },
   //   {
@@ -95,10 +96,10 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   // }
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <nav className="w-full max-w-xl flex gap-1.5">
+    <div className="flex flex-col gap-1.5">
+      <nav className="flex w-full max-w-xl items-start gap-10">
         <Dialog>
-          <DialogTrigger className="flex items-center gap-1">
+          <DialogTrigger className="flex items-center gap-1 rounded-lg border-2 border-zinc-400 p-2">
             {query ?? "Query"} <Search className="size-4" />
           </DialogTrigger>
           <DialogContent className="max-w-xl">
@@ -117,7 +118,25 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
           </DialogContent>
         </Dialog>
 
-        <LocationSearch selected={selected} setSelected={setSelected} />
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger className="flex items-center gap-1 rounded-lg border-2 border-zinc-400 p-2">
+            {selected ? selected : "Location"} <Search className="size-4" />
+          </DialogTrigger>
+
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Search Job</DialogTitle>
+            </DialogHeader>
+
+            <LocationSearch
+              selected={selected}
+              setSelected={(value) => {
+                setSelected(value);
+                setOpen(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </nav>
 
       {data.map((job: JobCardProps, index: number) => {
@@ -129,9 +148,11 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
           >
             <CardHeader className="flex flex-row items-center gap-4">
               {job.employer_logo ? (
-                <img
+                <Image
                   src={job.employer_logo}
                   alt={job.employer_name}
+                  height={40}
+                  width={40}
                   className="h-12 w-12 rounded-full border object-contain"
                 />
               ) : (

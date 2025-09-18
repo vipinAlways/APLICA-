@@ -1,5 +1,3 @@
-import { api } from "~/trpc/react";
-
 export const promptForSuggestions = `You are a resume improvement assistant. Analyze the resume and return JSON with these exact keys:
 
 {

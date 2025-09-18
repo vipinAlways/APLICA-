@@ -35,7 +35,6 @@ import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Dialog,
   DialogContent,

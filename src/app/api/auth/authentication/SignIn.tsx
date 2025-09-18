@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "motion/react";
 import { api } from "~/trpc/react";
-import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 
@@ -47,10 +46,10 @@ const SignIn = () => {
     [authProp.email, userQuery.data],
   );
 
-  const handleSignup = useCallback(async () => {
-    //TODO:signup functionality with credentical
-    console.log("hogyasignup");
-  }, []);
+  // const handleSignup = useCallback(async () => {
+  //   //TODO:signup functionality with credentical
+  //   console.log("hogyasignup");
+  // }, []);
 
   return (
     <section className="mt-20 flex w-full items-center justify-center">

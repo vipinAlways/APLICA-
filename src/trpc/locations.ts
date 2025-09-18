@@ -1,10 +1,12 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 interface data {
-  data: {
-    country: string;
-    cities: string[];
-  };
+  data: [
+    {
+      country: string;
+      cities: string[];
+    },
+  ];
 }
 
 export const locations = createTRPCRouter({
@@ -12,6 +14,7 @@ export const locations = createTRPCRouter({
     const res = await fetch("https://countriesnow.space/api/v0.1/countries");
     const data: data = await res.json();
 
-    return data.data;
+    if (!data) return null;
+    return data?.data;
   }),
 });

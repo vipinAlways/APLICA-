@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 
 interface CountryData {
@@ -16,18 +16,15 @@ export default function LocationSearch({ selected, setSelected }: Props) {
   const countryData: CountryData[] = data ?? [];
 
   const [query, setQuery] = useState("");
-  const [filtered, setFiltered] = useState<CountryData[]>([]);
 
-  useEffect(() => {
-    if (!countryData.length) return;
+  const filtered = useMemo(() => {
+    if (!countryData.length) return [];
 
-    if (!query) {
-      setFiltered(countryData);
-      return;
-    }
+    if (!query) return countryData;
 
     const lower = query.toLowerCase();
-    const filteredData = countryData
+
+    return countryData
       .map((c) => ({
         ...c,
         cities: c.cities.filter((city) => city.toLowerCase().includes(lower)),
@@ -35,8 +32,6 @@ export default function LocationSearch({ selected, setSelected }: Props) {
       .filter(
         (c) => c.country.toLowerCase().includes(lower) || c.cities.length > 0,
       );
-
-    setFiltered(filteredData);
   }, [query, countryData]);
 
   if (isLoading) {

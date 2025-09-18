@@ -6,10 +6,10 @@ import { Button } from "./ui/button";
 import { useIsMobile } from "~/hooks/use-mobile";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { Copy, CopyCheck, CopyIcon, Loader2Icon } from "lucide-react";
+import { Copy, CopyCheck, Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
-  const [data, setData] = useState("");
+  // const [data, setData] = useState("");
   const [email, setEmail] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
   const [activeTab, setActiveTab] = useState("fitscore"); // normalized default
@@ -31,7 +31,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   } = api.pdfRoute.createEmailAccToJob.useMutation({
     mutationKey: ["getEmail", job.job_title, job.job_description],
     onSuccess: () => {
-      setEmail(emaildata?.parsed.email!);
+      setEmail(emaildata?.parsed.email ?? "");
       toast("Here is your Email");
     },
   });
@@ -43,6 +43,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   } = api.pdfRoute.createCoverLetter.useMutation({
     mutationKey: ["getCoverLetter", job.job_title, job.job_description],
     onSuccess: () => {
+      setCoverLetter(coverLetterData?.coverLetter ?? "");
       toast("Here is your cover letter");
     },
   });
@@ -151,8 +152,8 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                 Consider adding a separate section for backend experience to
                 highlight Node.js, Express.js, and Prisma skills.Quantify
                 achievements by including metrics or statistics in project
-                descriptions, such as 'Built real-time group music app with
-                10,000+ users'.Update the education section to include the
+                descriptions, such as &#39;Built real-time group music app with
+                10,000+ users&#39;.Update the education section to include the
                 expected graduation date and any relevant certifications or
                 courses.{" "}
               </p>
@@ -167,15 +168,15 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       Component: (
         <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
           <Button
-            onClick={() => {
+            onClick={async () => {
               if (!email) {
                 toast("Empty Email!");
                 return;
               }
 
-              handleCopy(email);
+              await handleCopy(email);
             }}
-            className="absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
+            className="Z-10 absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
           >
             {copied ? <CopyCheck /> : <Copy />}
           </Button>
@@ -197,9 +198,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             <textarea
               name="email"
               id="email"
-              value={(emaildata && emaildata.parsed.email) ?? ""}
+              value={emaildata ? emaildata.parsed.email : ""}
               onChange={(e) => setEmail(e.target.value)}
-              className="mail h-80 w-full overflow-y-auto rounded-md p-1"
+              className="mail mt-8 h-80 w-full overflow-y-auto rounded-md p-1"
             ></textarea>
           )}
 
@@ -212,13 +213,13 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       Component: (
         <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
           <Button
-            onClick={() => {
+            onClick={async () => {
               if (!coverLetterData?.coverLetter) {
                 toast("Empty cover Letter!");
                 return;
               }
 
-              handleCopy(coverLetter);
+              await handleCopy(coverLetter);
             }}
             className="absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
           >
@@ -242,9 +243,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             <textarea
               name="coverLetter"
               id="coverLetter"
-              value={(coverLetterData && coverLetterData.coverLetter) ?? ""}
+              value={coverLetterData ? coverLetterData.coverLetter : ""}
               onChange={(e) => setCoverLetter(e.target.value)}
-              className="mail h-80 w-full overflow-y-auto rounded-md p-1"
+              className="mail mt-8 h-80 w-full overflow-y-auto rounded-md p-1"
             ></textarea>
           )}
         </div>

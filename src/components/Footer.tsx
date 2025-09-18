@@ -4,53 +4,56 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="fixed top-0 left-0 z-10 flex h-screen w-full items-center justify-center bg-[#F8F2EA] text-[#450C18] dark:bg-[#450C18] dark:text-[#F8F2EA]">
-      <div className="flex w-full flex-col items-center justify-center gap-2 z-40">
-        <div className="flex w-full items-center justify-between px-20">
+    <footer className="fixed bottom-0 left-0 z-10 flex h-52 items-center justify-center w-full bg-[#F8F2EA] text-[#450C18] dark:bg-[#450C18] dark:text-[#F8F2EA]">
+      <div className="z-40 flex w-full items-center justify-around gap-2">
+        <div className="flex items-center flex-col gap-1 justify-between px-20">
           <Image
             src={"/logo.png"}
             alt="logo of vipinAlways"
-            height={140}
-            width={140}
+            height={70}
+            width={70}
             className="rounded-lg"
           />
 
-          <div>
+          <div className="flex items-center gap-4">
             <a
               href="https://itsvipin.me"
-              className="group flex items-center gap-4 text-3xl"
+              className="group flex items-center gap-0.5 text-lg"
             >
-              <Folder className="size-10 transition-all duration-150 ease-out group-hover:text-yellow-300" />{" "}
+              <Folder className="size-5 transition-all duration-150 ease-out group-hover:text-yellow-300" />{" "}
               <i className="font-semibold">Vipin</i>
             </a>
             <a
               href="https://github.com/vipinAlways"
-              className="group flex items-center gap-4 text-3xl"
+              className="group flex items-center gap-0.5 text-lg"
             >
-              <Github className="size-10 transition-all duration-150 ease-out group-hover:text-gray-600" />{" "}
+              <Github className="size-5 transition-all duration-150 ease-out group-hover:text-gray-600" />{" "}
               <i className="font-semibold">vipinAlways</i>
             </a>
           </div>
         </div>
-        <h1 className="text-[11rem] font-bold">
-          <i>VipinAlways</i>
-        </h1>
+        <div className=" ">
+          <h1 className="text-3xl font-bold">
+            <h3 className="text-xl">Made by</h3>
+            <i>VipinAlways</i>
+          </h1>
+        </div>
 
-        <div className="flex w-full items-start">
-          <div className="flex w-3/5 items-center justify-evenly">
+        <div className="flex">
+          <div className="flex w-3/5 flex-col justify-around gap-1">
             <span className="text-3xl font-medium">
               <i>Connect</i>
             </span>
 
             <div className="flex items-center gap-4">
               <a href="">
-                <Instagram className="size-10 transition-all duration-150 ease-out hover:text-[#C13584]" />
+                <Instagram className="size-6 transition-all duration-150 ease-out hover:text-[#C13584]" />
               </a>
               <a href="">
-                <Linkedin className="size-10 transition-all duration-150 ease-out hover:text-blue-600" />
+                <Linkedin className="size-6 transition-all duration-150 ease-out hover:text-blue-600" />
               </a>
               <a href="">
-                <MailIcon className="size-10 transition-all duration-150 ease-out hover:text-blue-500" />
+                <MailIcon className="size-6 transition-all duration-150 ease-out hover:text-blue-500" />
               </a>
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
-import { File, FileIcon, ListStart, Loader2, X } from "lucide-react";
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import { File, FileIcon, ListStart, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import { api } from "~/trpc/react";
 import Jobs from "~/components/Jobs";
@@ -23,7 +23,10 @@ const Find = () => {
     doc.setFontSize(12);
 
     const pageWidth = doc.internal.pageSize.getWidth() - 40;
-    const lines = doc.splitTextToSize(`${user.SuggestedResume}`, pageWidth);
+    const lines: string[] = doc.splitTextToSize(
+      `${user.SuggestedResume}`,
+      pageWidth,
+    );
 
     let y = 20;
     lines.forEach((line: string) => {

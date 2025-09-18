@@ -416,17 +416,15 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
           .replace(/```\s*/g, "")
           .trim();
 
-        // extract only JSON portion if there is extra text
         const jsonStart = cleanedOutput.indexOf("{");
         const jsonEnd = cleanedOutput.lastIndexOf("}");
         if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
           cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
         }
 
-        // sanitize control characters
         let safeOutput = cleanedOutput
-          .replace(/[\x00-\x1F\x7F]/g, "") // strip invalid ASCII
-          .replace(/(?<!\\)\n/g, "\\n") // escape raw newlines
+          .replace(/[\x00-\x1F\x7F]/g, "")
+          .replace(/(?<!\\)\n/g, "\\n")
           .replace(/(?<!\\)\r/g, "\\r")
           .replace(/(?<!\\)\t/g, "\\t");
 
