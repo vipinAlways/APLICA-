@@ -13,7 +13,9 @@ interface Props {
 
 export default function LocationSearch({ selected, setSelected }: Props) {
   const { data, isLoading } = api.locatiosns.locations.useQuery();
-  const countryData: CountryData[] = data ?? [];
+  const countryData: CountryData[] = useMemo(() => {
+    return data ?? [];
+  }, [data]);
 
   const [query, setQuery] = useState("");
 

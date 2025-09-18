@@ -22,7 +22,7 @@ const Find = () => {
     doc.setFont("courier", "normal");
     doc.setFontSize(12);
 
-    const pageWidth = doc.internal.pageSize.getWidth() - 40;
+    const pageWidth: number = doc.internal.pageSize.getWidth() - 40;
     const lines: string[] = doc.splitTextToSize(
       `${user.SuggestedResume}`,
       pageWidth,

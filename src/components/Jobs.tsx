@@ -176,7 +176,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                 </span>
               </div>
 
-              {(job.job_salary_min || job.job_salary_max) && (
+              {(job.job_salary_min ?? job.job_salary_max) && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <DollarSign className="h-4 w-4" />
                   <span>

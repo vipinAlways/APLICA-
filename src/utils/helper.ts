@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import PDFParser from "pdf2json";
-import { string } from "zod";
 import type {
   PDFParserConstructor,
   PDFParserError,
@@ -88,7 +87,7 @@ export function extractFallbackData(
       // Original resume improvement logic
       let polished_resume = "";
       const mistakes_and_suggestions: string[] = [];
-      let skills_to_learn: string[] = [];
+      const skills_to_learn: string[] = [];
       let field = "";
       let currentSection = "";
 
@@ -140,9 +139,8 @@ export function extractFallbackData(
         };
       }
     } else if (type === "jobfit") {
-      // Job fit logic
-      let fit_score = 50; // default
-      let improvements: string[] = [];
+      let fit_score = 50;
+      const improvements: string[] = [];
       let currentSection = "";
 
       for (const line of lines) {
@@ -153,7 +151,9 @@ export function extractFallbackData(
           lowerLine.includes("score") ||
           lowerLine.includes("%")
         ) {
-          const match = line.match(/(\d+)%?/);
+          const regex = /(\d+)%?/;
+          const match = regex.exec(line);
+
           //TODO: regax methos
           if (match?.[1]) {
             fit_score = parseInt(match[1]);

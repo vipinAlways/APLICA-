@@ -76,7 +76,7 @@ async function streamPdfToFile(url: string, destPath: string): Promise<void> {
     };
 
     fileStream.on("error", reject);
-    pump();
+    void pump();
   });
 }
 
@@ -422,7 +422,7 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
           cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
         }
 
-        let safeOutput = cleanedOutput
+        const safeOutput = cleanedOutput
           .replace(/[\x00-\x1F\x7F]/g, "")
           .replace(/(?<!\\)\n/g, "\\n")
           .replace(/(?<!\\)\r/g, "\\r")

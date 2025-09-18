@@ -30,9 +30,10 @@ export interface PDFParserError {
   message?: string;
 }
 
-export interface PDFParserConstructor {
-  new (context?: unknown, needRawText?: number): PDFParserInstance;
-}
+export type PDFParserConstructor = new (
+  context?: unknown,
+  needRawText?: number,
+) => PDFParserInstance;
 
 export interface JobCardProps {
   employer_name: string;
