@@ -4,9 +4,9 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="fixed bottom-0 left-0 z-10 flex h-52 items-center justify-center w-full bg-[#F8F2EA] text-[#450C18] dark:bg-[#450C18] dark:text-[#F8F2EA]">
+    <footer className="fixed bottom-0 left-0 z-10 flex h-52 w-full items-center justify-center bg-[#F8F2EA] text-[#450C18] dark:bg-[#450C18] dark:text-[#F8F2EA]">
       <div className="z-40 flex w-full items-center justify-around gap-2">
-        <div className="flex items-center flex-col gap-1 justify-between px-20">
+        <div className="flex flex-col items-center justify-between gap-1 px-20">
           <Image
             src={"/logo.png"}
             alt="logo of vipinAlways"
@@ -33,10 +33,9 @@ const Footer = () => {
           </div>
         </div>
         <div className=" ">
-          <h1 className="text-3xl font-bold">
-            <h3 className="text-xl">Made by</h3>
-            <i>VipinAlways</i>
-          </h1>
+          <h3 className="text-xl">Made by</h3>
+
+          <i className="text-3xl font-bold">VipinAlways</i>
         </div>
 
         <div className="flex">

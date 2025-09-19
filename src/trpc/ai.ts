@@ -196,7 +196,7 @@ export const pdfRoute = createTRPCRouter({
             cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
           }
 
-          const parsedJson = JSON.parse(cleanedOutput);
+          const parsedJson = JSON.parse(cleanedOutput) as ResumeImprovementResponse ;
           aiResult = ResumeSchema.parse(parsedJson);
         } catch (parseError) {
           console.error("Invalid AI response:", rawOutput);

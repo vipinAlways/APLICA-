@@ -24,9 +24,9 @@ const Find = () => {
 
     const pageWidth: number = doc.internal.pageSize.getWidth() - 40;
     const lines: string[] = doc.splitTextToSize(
-      `${user.SuggestedResume}`,
+      String(user.SuggestedResume),
       pageWidth,
-    );
+    ) as string[];
 
     let y = 20;
     lines.forEach((line: string) => {

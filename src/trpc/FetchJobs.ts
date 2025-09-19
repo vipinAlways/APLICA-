@@ -1,6 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import type { JobCardProps } from "~/type/types";
+
+interface data {
+  data: JobCardProps[];
+}
 
 export const jobsRoute = createTRPCRouter({
   getJobs: protectedProcedure
@@ -10,7 +15,7 @@ export const jobsRoute = createTRPCRouter({
         country: z.string().optional(),
         city: z.string().optional(),
         page: z.number().optional(),
-        isRomte: z.boolean().default(true),
+        isRemote: z.boolean().default(true),
       }),
     )
     .query(async ({ input }) => {
@@ -18,10 +23,11 @@ export const jobsRoute = createTRPCRouter({
         input.query,
       )}&page=${encodeURIComponent(input.page ?? 1)}&num_pages=${encodeURIComponent(
         input.page ?? 1,
-      )}&country=${encodeURIComponent(input.country ?? "IN")}&city=${encodeURIComponent(
-        input.city ?? "",
-      )}&date_posted=all&remote_jobs_only=${encodeURIComponent(input.isRomte)}`;
-
+      )}&num_jobs=${encodeURIComponent(20)}&country=${encodeURIComponent(
+        input.country ?? "IN",
+      )}&city=${encodeURIComponent(input.city ?? "")}&date_posted=all&remote_jobs_only=${encodeURIComponent(
+        input.isRemote ?? false,
+      )}`;
       const options = {
         method: "GET",
         headers: {
@@ -33,16 +39,19 @@ export const jobsRoute = createTRPCRouter({
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
-          console.log(response);
           throw new Error(`API error: ${response.status}`);
         }
-        const result = await response.json();
+        const result = (await response.json()) as data;
+
+        if (!result) {
+          return null;
+        }
         return result;
       } catch (error) {
-        console.error(error);
         throw new TRPCError({
           code: "BAD_GATEWAY",
           message: "Unable to fetch jobs. Please try again later.",
+          cause: error,
         });
       }
     }),
