@@ -49,11 +49,11 @@ const Nav = () => {
 
   return (
     <nav className="group w-full text-zinc-900">
-      <div className="flex w-full items-center justify-between rounded-lg p-2 text-2xl backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40">
+      <div className="flex w-full items-center justify-between rounded-lg p-0.5 text-lg backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40 md:p-2 md:text-2xl">
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
-        <div className="flex w-80 items-center justify-center gap-1">
+        <div className="flex md:w-80 w-fit items-center justify-center gap-1">
           {session.status === "loading" ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
           ) : session.data ? (
@@ -72,9 +72,6 @@ const Nav = () => {
                     <p className="w-full truncate text-sm">
                       {" "}
                       {session.data.user.name ?? "User"}
-                    </p>
-                    <p className="w-full truncate text-xs">
-                      {session.data.user.email}
                     </p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />

@@ -196,7 +196,9 @@ export const pdfRoute = createTRPCRouter({
             cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
           }
 
-          const parsedJson = JSON.parse(cleanedOutput) as ResumeImprovementResponse ;
+          const parsedJson = JSON.parse(
+            cleanedOutput,
+          ) as ResumeImprovementResponse;
           aiResult = ResumeSchema.parse(parsedJson);
         } catch (parseError) {
           console.error("Invalid AI response:", rawOutput);
@@ -328,7 +330,7 @@ export const pdfRoute = createTRPCRouter({
           cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
         }
 
-        const parsedJson = JSON.parse(cleanedOutput);
+        const parsedJson = JSON.parse(cleanedOutput) as promptForJobFitResponse;
         aiResult = promptForJobFitSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
@@ -428,7 +430,7 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
           .replace(/(?<!\\)\r/g, "\\r")
           .replace(/(?<!\\)\t/g, "\\t");
 
-        const parsedJson = JSON.parse(safeOutput);
+        const parsedJson = JSON.parse(safeOutput) as promptForEmailResponse;
         aiResult = promptForEmailSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
@@ -528,7 +530,9 @@ Escape all special characters properly inside strings (e.g. newlines as \\n)..`,
           cleanedOutput = cleanedOutput.substring(jsonStart, jsonEnd + 1);
         }
 
-        const parsedJson = JSON.parse(cleanedOutput);
+        const parsedJson = JSON.parse(
+          cleanedOutput,
+        ) as promptForCoverLetterResponse;
         aiResult = promptForCoverLetterSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);

@@ -17,7 +17,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN: z.string(),
     SAMBANOVA_API_KEY: z.string(),
-    JOOBLE_APIKEY: z.string(),
+
     RAPIDAPI_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -44,7 +44,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     SAMBANOVA_API_KEY: process.env.SAMBANOVA_API_KEY,
-    JOOBLE_APIKEY: process.env.JOOBLE_APIKEY,
+
     RAPIDAPI_KEY: process.env.RAPIDAPI_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },

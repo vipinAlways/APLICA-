@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Loader from "~/components/Loader";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -12,9 +13,9 @@ import UploadResume from "~/components/UploadResume";
 
 const Page = () => {
   return (
-    <div className="h-full ">
+    <div className="h-full">
       <div className="mt-20 flex w-full max-md:flex-col">
-        <div className="flex h-96 flex-1 flex-col items-center justify-around p-3 text-xl md:items-start">
+        <div className="flex h-96 flex-1 flex-col items-center justify-around gap-2 p-3 text-xl md:items-start">
           <h1 className="w-full text-2xl font-bold text-wrap max-md:text-center md:text-5xl">
             Turn Your Resume Into a Job Winning Document in Minutes
           </h1>
@@ -29,9 +30,9 @@ const Page = () => {
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button>Find Job</Button>
+              <Button className="px-4 py-2 text-base">Find Job</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="md:max-w-2xl  ">
               <DialogHeader>
                 <DialogTitle>Deploy your resume</DialogTitle>
               </DialogHeader>

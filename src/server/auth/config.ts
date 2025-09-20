@@ -4,7 +4,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { db } from "~/server/db";
 import { clearVerificationTokens } from "./clearVerificationTokens";
 
-
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
@@ -34,6 +33,7 @@ export const authConfig = {
       allowDangerousEmailAccountLinking: true,
     }),
   ],
+  trustHost: true,
 
   callbacks: {
     async jwt({ token, user }) {

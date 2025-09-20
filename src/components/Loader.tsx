@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 
@@ -19,27 +19,26 @@ export default function Loader() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % texts.length);
-      // delay active highlight until scroll animation completes
+
       setTimeout(() => {
         setActiveIndex((prev) => (prev + 1) % texts.length);
-      }, 700); // must match transition duration
-    }, 1000); // total cycle
+      }, 700);
+    }, 1000);
     return () => clearInterval(interval);
   }, [texts.length]);
 
   return (
     <div className="flex h-[calc(100vh-10rem)] w-full items-center justify-center">
       <div className="relative h-36 w-full overflow-hidden p-4">
-        {/* Gradient fade */}
-        <div className="pointer-events-none absolute top-0 h-1/3 w-full " />
-        <div className="pointer-events-none absolute bottom-0 h-1/3 w-full " />
+        <div className="pointer-events-none absolute top-0 h-1/3 w-full" />
+        <div className="pointer-events-none absolute bottom-0 h-1/3 w-full" />
 
         <div
-          className="flex flex-col items-center gap-4 text-2xl transition-transform duration-[0.45s] ease-in-out"
+          className="flex flex-col items-center gap-4 text-lg transition-transform duration-[0.45s] ease-in-out md:text-2xl"
           style={{ transform: `translateY(-${currentIndex * 2}rem)` }}
         >
           {texts.map((text, index) => {
-            const isCenter = index === activeIndex; // ✅ only highlight when fully centered
+            const isCenter = index === activeIndex;
             return (
               <p
                 key={index}
@@ -51,7 +50,7 @@ export default function Loader() {
               >
                 <span>
                   <Check
-                    className={`size-8 rounded-full border p-0.5 transition-colors duration-300 ${
+                    className={`size-4 rounded-full border p-0.5 transition-colors duration-300 md:size-8 ${
                       isCenter
                         ? "border-green-500 text-green-500"
                         : "border-white text-white"

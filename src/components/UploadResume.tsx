@@ -36,6 +36,10 @@ const UploadResume = () => {
         mutate({ pdfUrl: res[0].url });
       }
     },
+    onUploadProgress: (progress) => setUploadProgress(progress),
+    onUploadError: () => {
+      toast.error("Something went wrong ");
+    },
   });
 
   const onDropRejected = (rejectedFile: FileRejection[]) => {
@@ -92,7 +96,6 @@ const UploadResume = () => {
           />
         </div>
 
-        
         <Dropzone
           onDropRejected={onDropRejected}
           onDropAccepted={onDropAccepted}
@@ -143,7 +146,6 @@ const UploadResume = () => {
           )}
         </Dropzone>
 
-       
         <div className="mt-4">
           <Button
             onClick={handleContinue}
