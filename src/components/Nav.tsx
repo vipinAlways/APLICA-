@@ -26,6 +26,7 @@ import {
 
 import {
   Bookmark,
+  BookmarkCheck,
   ChevronDownIcon,
   CreditCardIcon,
   Loader2Icon,
@@ -35,25 +36,19 @@ import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "./ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { usePathname } from "next/navigation";
 
 const Nav = () => {
   const session = useSession();
   const isMobile = useIsMobile();
-
+  const pathName = usePathname();
   return (
     <nav className="group w-full text-zinc-900">
       <div className="flex w-full items-center justify-between rounded-lg p-0.5 text-lg backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40 md:p-2 md:text-2xl">
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
-        <div className="flex md:w-80 w-fit items-center justify-center gap-1">
+        <div className="flex w-fit items-center justify-center gap-1 md:w-80">
           {session.status === "loading" ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
           ) : session.data ? (
@@ -182,19 +177,8 @@ const Nav = () => {
               </Link>
             </div>
           )}
-          <Dialog>
-            <DialogTrigger>
-              <Bookmark className="size-5" />
-            </DialogTrigger>
-
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle className="mx-auto text-lg font-semibold">
-                  BookMarks
-                </DialogTitle>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          <Link href={"/bookmark"}>
+          {pathName === "bookmark" ?  <BookmarkCheck className="size-6"/> : <Bookmark className="size-6"/> }</Link>
         </div>
       </div>
     </nav>

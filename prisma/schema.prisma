@@ -62,3 +62,20 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model JobCard {
+    id              String  @id @default(cuid())
+    employer_name   String
+    employer_logo   String? // optional
+    job_title       String
+    job_description String
+    job_location    String
+    job_country     String
+    job_salary_min  Int? // optional / nullable
+    job_salary_max  Int? // optional / nullable
+    job_publisher   String
+    job_apply_link  String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
