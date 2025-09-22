@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -75,6 +76,108 @@ export const User = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Not able to receive file please try again",
+        });
+      }
+    }),
+
+  bookmarkJobs: protectedProcedure.query(async ({ ctx }) => {
+    const session = await auth();
+
+    if (!session) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User is to logged in",
+      });
+    }
+
+    try {
+      const markedJobs = await ctx.db.user.findFirst({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          JobCard: true,
+        },
+      });
+      if (!markedJobs) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Not have any mark Jobs",
+        });
+      }
+      return markedJobs;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong",
+        cause: error,
+      });
+    }
+  }),
+
+  addtoBookMark: protectedProcedure
+    .input(
+      z.object({
+        employer_name: z.string(),
+        employer_logo: z.string().optional(),
+        job_title: z.string(),
+        job_description: z.string(),
+        job_location: z.string(),
+        job_country: z.string(),
+        job_salary_min: z.number().optional(),
+        job_salary_max: z.number().optional(),
+        job_publisher: z.string(),
+        job_apply_link: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const {
+        employer_name,
+        job_apply_link,
+        job_country,
+        job_description,
+        job_location,
+        job_publisher,
+        job_title,
+        employer_logo,
+        job_salary_max,
+        job_salary_min,
+      } = input;
+      const session = await auth();
+
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User is to logged in",
+        });
+      }
+
+      try {
+        const bookMark = await ctx.db.jobCard.create({
+          data: {
+            employer_name,
+            job_apply_link,
+            job_country,
+            job_description,
+            job_location,
+            job_publisher,
+            job_title,
+            ...(employer_logo && { employer_logo }),
+            ...(job_salary_min !== undefined && { job_salary_min }),
+            ...(job_salary_max !== undefined && { job_salary_max }),
+            userId: session.user.id,
+          },
+        });
+
+        return {
+          message: "Data saved",
+          bookMark,
+        };
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+          cause: error,
         });
       }
     }),

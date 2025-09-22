@@ -36,14 +36,15 @@ export type PDFParserConstructor = new (
 ) => PDFParserInstance;
 
 export interface JobCardProps {
+  id?: string;
   employer_name: string;
-  employer_logo?: string;
+  employer_logo: string | null;
   job_title: string;
   job_description: string;
   job_location: string;
   job_country: string;
-  job_salary_min?: number | null;
-  job_salary_max?: number | null;
+  job_salary_min: number | null;
+  job_salary_max: number | null;
   job_publisher: string;
   job_apply_link: string;
 }

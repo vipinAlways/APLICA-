@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Copy, CopyCheck, Loader2Icon } from "lucide-react";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
-  // const [data, setData] = useState("");
   const [email, setEmail] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
   const [activeTab, setActiveTab] = useState("fitscore"); // normalized default
@@ -23,6 +22,9 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     mutationKey: ["getFitScore"],
     onSuccess: () => toast("here what you want"),
   });
+
+
+
 
   const {
     mutate: emailMutate,

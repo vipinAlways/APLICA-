@@ -1,6 +1,6 @@
 "use client";
 import { Loader2Icon, Search } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { MapPin, DollarSign, Building } from "lucide-react";
@@ -18,6 +18,7 @@ import LocationSearch from "./LocationSearch";
 import JobContentApply from "./JobContentApply";
 import Image from "next/image";
 import { api } from "~/trpc/react";
+import { toast } from "sonner";
 
 const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [query, setQuery] = useState(fetchedQuery);
@@ -27,6 +28,16 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [page, setPage] = useState(1);
   const [dataHold, setDataHold] = useState<JobCardProps[]>([]);
   const [country, setCountry] = useState("");
+
+  const { mutate, isPending } = api.user.addtoBookMark.useMutation({
+    mutationKey: ["add-bookMark"],
+    onSuccess: () => {
+      toast("Added To Bookmark");
+    },
+    onError: () => {
+      toast.error("Something Went Wrong");
+    },
+  });
 
   const { data, isLoading } = api.getjobs.getJobs.useQuery(
     {
@@ -39,17 +50,15 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
     },
   );
 
-  // Debounce search input
   useEffect(() => {
     const timeout = setTimeout(() => setDebounceQuery(query), 2000);
     return () => clearTimeout(timeout);
   }, [query]);
 
-  // Reset country when a new selection is made
   useEffect(() => {
     setCountry(selected);
     setPage(1);
-    setDataHold([]); // clear old data
+    setDataHold([]);
   }, [selected]);
 
   useEffect(() => {
@@ -57,6 +66,21 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
       setDataHold((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
     }
   }, [data, isLoading, page]);
+
+  const handleBookMark = useCallback((job: JobCardProps) => {
+    mutate({
+      employer_name: job.employer_name,
+      job_apply_link: job.job_apply_link,
+      job_country: job.job_country,
+      job_description: job.job_description,
+      job_location: job.job_location,
+      job_publisher: job.job_publisher,
+      job_title: job.job_title,
+      employer_logo: job.employer_logo ?? "",
+      job_salary_max: job.job_salary_max ?? 0,
+      job_salary_min: job.job_salary_min ?? 0,
+    });
+  }, []);
 
   if ((isLoading || !data) && dataHold.length === 0) {
     return (
@@ -174,13 +198,15 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
                 <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-4xl">
                   <DialogHeader className="flex h-10 w-full items-center justify-center">
-                    <DialogTitle>
-                      <i>Aplica-</i>
+                    <DialogTitle className="relative">
+                      <i>Aplica-</i>{" "}
+                      <Button onClick={() => handleBookMark(job)}></Button>
                     </DialogTitle>
+
                     <DialogDescription>Apply here</DialogDescription>
                   </DialogHeader>
 
-                  <div className="">
+                  <div>
                     <JobContentApply job={job} />
                   </div>
                 </DialogContent>

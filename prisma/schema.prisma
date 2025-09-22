@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -10,19 +7,18 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
     userId                   String
     type                     String
     provider                 String
     providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
+    refresh_token            String?
+    access_token             String?
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String?
     session_state            String?
     user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     refresh_token_expires_in Int?
@@ -53,6 +49,7 @@ model User {
     suggestion      String[]
     SuggestedResume String?
     field           String?
+    JobCard         JobCard[]
 }
 
 model VerificationToken {
@@ -63,19 +60,20 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model JobCard {
-    id              String  @id @default(cuid())
-    employer_name   String
-    employer_logo   String? // optional
-    job_title       String
-    job_description String
-    job_location    String
-    job_country     String
-    job_salary_min  Int? // optional / nullable
-    job_salary_max  Int? // optional / nullable
-    job_publisher   String
-    job_apply_link  String
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
+    model JobCard {
+        id              String   @id @default(cuid())
+        employer_name   String
+        employer_logo   String?
+        job_title       String
+        job_description String
+        job_location    String
+        job_country     String
+        job_salary_min  Int?
+        job_salary_max  Int?
+        job_publisher   String
+        job_apply_link  String
+        userId          String
+        createdAt       DateTime @default(now())
+        updatedAt       DateTime @updatedAt
+        user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    }
