@@ -138,7 +138,7 @@ export const pdfRoute = createTRPCRouter({
           };
         }
 
-        await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 20_000); // 20s
+        await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 20_000);
 
         const parsedText = await withTimeout(
           () => parsePdf(tempFilePath),

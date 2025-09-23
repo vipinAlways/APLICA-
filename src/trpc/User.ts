@@ -1,5 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -118,6 +117,7 @@ export const User = createTRPCRouter({
   addtoBookMark: protectedProcedure
     .input(
       z.object({
+        id: z.string(),
         employer_name: z.string(),
         employer_logo: z.string().optional(),
         job_title: z.string(),
@@ -132,6 +132,7 @@ export const User = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const {
+        id,
         employer_name,
         job_apply_link,
         job_country,
@@ -155,6 +156,7 @@ export const User = createTRPCRouter({
       try {
         const bookMark = await ctx.db.jobCard.create({
           data: {
+            id: id,
             employer_name,
             job_apply_link,
             job_country,
@@ -181,4 +183,47 @@ export const User = createTRPCRouter({
         });
       }
     }),
+  removeFromBookMark: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const session = await auth();
+
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User is to logged in",
+        });
+      }
+
+      try {
+        return await ctx.db.jobCard.delete({
+          where: {
+            id: input.id,
+          },
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+          cause: error,
+        });
+      }
+    }),
+
+  getBookmarks: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findFirst({
+      where: { id: ctx.session.user.id },
+      select: {
+        JobCard: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+  }),
 });

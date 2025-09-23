@@ -35,21 +35,31 @@ model Session {
 }
 
 model User {
-    id              String    @id @default(cuid())
-    password        String?
-    name            String?
-    email           String?   @unique
-    emailVerified   DateTime?
-    image           String?
-    accounts        Account[]
-    sessions        Session[]
-    Resume          String?
-    userResumeText  String?
-    improvement     String[]
-    suggestion      String[]
-    SuggestedResume String?
-    field           String?
-    JobCard         JobCard[]
+    id                  String    @id @default(cuid())
+    password            String?
+    name                String?
+    email               String?   @unique
+    emailVerified       DateTime?
+    image               String?
+    accounts            Account[]
+    sessions            Session[]
+    Resume              String?
+    userResumeText      String?
+    improvement         String[]
+    suggestion          String[]
+    SuggestedResume     String?
+    field               String?
+    JobCard             JobCard[]
+    plan                types     @default(BASE)
+    numberOfCoverLetter Int       @default(0)
+    numberOfEmail       Int       @default(0)
+    numberOfScore       Int       @default(0)
+}
+
+enum types {
+    BASE
+    MEDIUM
+    PRO
 }
 
 model VerificationToken {
@@ -60,20 +70,20 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-    model JobCard {
-        id              String   @id @default(cuid())
-        employer_name   String
-        employer_logo   String?
-        job_title       String
-        job_description String
-        job_location    String
-        job_country     String
-        job_salary_min  Int?
-        job_salary_max  Int?
-        job_publisher   String
-        job_apply_link  String
-        userId          String
-        createdAt       DateTime @default(now())
-        updatedAt       DateTime @updatedAt
-        user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    }
+model JobCard {
+    id              String   @id @default(cuid())
+    employer_name   String
+    employer_logo   String?
+    job_title       String
+    job_description String
+    job_location    String
+    job_country     String
+    job_salary_min  Int?
+    job_salary_max  Int?
+    job_publisher   String
+    job_apply_link  String
+    userId          String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Loader from "~/components/Loader";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -32,7 +31,7 @@ const Page = () => {
             <DialogTrigger asChild>
               <Button className="px-4 py-2 text-base">Find Job</Button>
             </DialogTrigger>
-            <DialogContent className="md:max-w-2xl  ">
+            <DialogContent className="md:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Deploy your resume</DialogTitle>
               </DialogHeader>

@@ -1,5 +1,11 @@
 "use client";
-import { Loader2Icon, Search } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  Loader2,
+  Loader2Icon,
+  Search,
+} from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -12,7 +18,6 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "./ui/dialog";
-
 import type { JobCardProps } from "~/type/types";
 import LocationSearch from "./LocationSearch";
 import JobContentApply from "./JobContentApply";
@@ -28,6 +33,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [page, setPage] = useState(1);
   const [dataHold, setDataHold] = useState<JobCardProps[]>([]);
   const [country, setCountry] = useState("");
+  const { data: bookmarks } = api.user.getBookmarks.useQuery();
 
   const { mutate, isPending } = api.user.addtoBookMark.useMutation({
     mutationKey: ["add-bookMark"],
@@ -39,7 +45,18 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
     },
   });
 
-  const { data, isLoading } = api.getjobs.getJobs.useQuery(
+  const { mutate: removeMutate, isPending: removerPending } =
+    api.user.removeFromBookMark.useMutation({
+      mutationKey: ["add-bookMark"],
+      onSuccess: () => {
+        toast("Added To Bookmark");
+      },
+      onError: () => {
+        toast.error("Something Went Wrong");
+      },
+    });
+
+  const { data, isLoading, isFetching } = api.getjobs.getJobs.useQuery(
     {
       query: debounceQuery,
       country,
@@ -67,21 +84,30 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
     }
   }, [data, isLoading, page]);
 
-  const handleBookMark = useCallback((job: JobCardProps) => {
-    mutate({
-      employer_name: job.employer_name,
-      job_apply_link: job.job_apply_link,
-      job_country: job.job_country,
-      job_description: job.job_description,
-      job_location: job.job_location,
-      job_publisher: job.job_publisher,
-      job_title: job.job_title,
-      employer_logo: job.employer_logo ?? "",
-      job_salary_max: job.job_salary_max ?? 0,
-      job_salary_min: job.job_salary_min ?? 0,
-    });
-  }, []);
-
+  const handleBookMark = useCallback(
+    (job: JobCardProps, remove: boolean) => {
+      if (!remove) {
+        mutate({
+          id: job.job_id!,
+          employer_name: job.employer_name,
+          job_apply_link: job.job_apply_link,
+          job_country: job.job_country,
+          job_description: job.job_description,
+          job_location: job.job_location,
+          job_publisher: job.job_publisher,
+          job_title: job.job_title,
+          employer_logo: job.employer_logo ?? "",
+          job_salary_max: job.job_salary_max ?? 0,
+          job_salary_min: job.job_salary_min ?? 0,
+        });
+      } else {
+        removeMutate({
+          id: job.job_id!,
+        });
+      }
+    },
+    [mutate, removeMutate],
+  );
   if ((isLoading || !data) && dataHold.length === 0) {
     return (
       <div className="flex h-40 w-full items-center justify-center">
@@ -136,6 +162,9 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
       {data?.data?.map((job: JobCardProps, index: number) => {
         const shortDescription = job.job_description.slice(0, 150);
+        const isBookmarked = bookmarks?.JobCard?.some(
+          (b) => b.id === job.job_id!,
+        );
         return (
           <Card
             key={`${index}`}
@@ -200,7 +229,21 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                   <DialogHeader className="flex h-10 w-full items-center justify-center">
                     <DialogTitle className="relative">
                       <i>Aplica-</i>{" "}
-                      <Button onClick={() => handleBookMark(job)}></Button>
+                      {isBookmarked ? (
+                        <Button
+                          onClick={() => handleBookMark(job, true)}
+                          disabled={isPending}
+                        >
+                          <BookmarkCheck className="size-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleBookMark(job, false)}
+                          disabled={removerPending}
+                        >
+                          <Bookmark className="size-4" />
+                        </Button>
+                      )}
                     </DialogTitle>
 
                     <DialogDescription>Apply here</DialogDescription>
@@ -217,12 +260,12 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
       })}
 
       <div className="flex w-full max-w-xl flex-col items-center justify-center rounded-2xl shadow-md">
-        {/* {isFetching && (
+        {isFetching && (
           <Loader2 className="my-2 size-6 animate-spin text-gray-600" />
-        )} */}
+        )}
         <Button
           className="w-full text-2xl"
-          // disabled={isFetching}
+          disabled={isFetching}
           onClick={() => setPage((prev) => prev + 1)}
         >
           Find More
