@@ -64,8 +64,8 @@ model User {
 
 enum PlanType {
     BASE
-    MEDIUM
     PRO
+    ELITE
 }
 
 model PaymentIntent {

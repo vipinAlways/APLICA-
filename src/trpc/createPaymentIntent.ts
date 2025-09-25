@@ -9,9 +9,10 @@ export const paymentRoute = createTRPCRouter({
     .input(
       z.object({
         amount: z.number(),
+        userPlan: z.enum(["BASE", "PRO", "ELITE"]),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       try {
         const paymentIntent = await stripe.paymentIntents.create({
           amount: input.amount,
@@ -19,12 +20,21 @@ export const paymentRoute = createTRPCRouter({
           automatic_payment_methods: { enabled: true },
         });
 
+        const updateUserPlan = await ctx.db.userPlan.update({
+          where: {
+            id: ctx.session.user.id,
+          },
+          data: {
+            planType: input.userPlan,
+          },
+        });
+
         return { clientSecret: paymentIntent.client_secret };
       } catch (error) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Internal server Error",
-          cause: error, 
+          cause: error,
         });
       }
     }),

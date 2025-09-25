@@ -59,23 +59,25 @@ Rules:
 - The value for "coverLetter" must always be a single string.
 `;
 
-export const planFeatures = {
-  [PlanType.BASE]: {
+export const planFeatures = [
+  {
+    planType: PlanType.BASE,
     maxCoverLetters: 10,
     maxEmails: 10,
     maxScores: 10,
     resumeUpload: 10,
   },
-  [PlanType.MEDIUM]: {
+  {
     maxCoverLetters: 100,
     maxEmails: 100,
     maxScores: 100,
     resumeUpload: 100,
   },
-  [PlanType.PRO]: {
+  {
+    plantype: PlanType.ELITE,
     maxCoverLetters: 888888888,
     maxEmails: 888888888,
     maxScores: 888888888,
     resumeUpload: 8888888,
   },
-} as const;
+];
