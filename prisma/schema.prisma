@@ -35,10 +35,10 @@ model Session {
 }
 
 model User {
-    id                  String    @id @default(cuid())
+    id                  String          @id @default(cuid())
     password            String?
     name                String?
-    email               String?   @unique
+    email               String?         @unique
     emailVerified       DateTime?
     image               String?
     accounts            Account[]
@@ -49,18 +49,54 @@ model User {
     suggestion          String[]
     SuggestedResume     String?
     field               String?
-    JobCard             JobCard[]
-    plan                types     @default(BASE)
-    numberOfCoverLetter Int       @default(0)
-    numberOfEmail       Int       @default(0)
-    numberOfScore       Int       @default(0)
-    resumeUpload        Int       @default(0)
+    numberOfCoverLetter Int             @default(0)
+    numberOfEmail       Int             @default(0)
+    numberOfScore       Int             @default(0)
+    resumeUpload        Int             @default(0)
+    stripeCustomerId    String?         @unique
+    PaymentIntent       PaymentIntent[]
+    UserPlan            UserPlan?
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    JobCard   JobCard[]
 }
 
-enum types {
+enum PlanType {
     BASE
     MEDIUM
     PRO
+}
+
+model PaymentIntent {
+    id                    String   @id @default(cuid())
+    stripePaymentIntentId String   @unique
+    userId                String
+    // planId                String
+    planType              PlanType // Add this to store plan type directly
+    amount                Float
+    status                String // pending, completed, failed, cancelled
+    createdAt             DateTime @default(now())
+    updatedAt             DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([status])
+    @@index([createdAt])
+}
+
+model UserPlan {
+    id       String   @id @default(cuid())
+    userId   String   @unique
+    planType PlanType @default(BASE)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([planType])
 }
 
 model VerificationToken {

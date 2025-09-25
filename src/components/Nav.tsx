@@ -184,7 +184,10 @@ const Nav = () => {
             )
           ) : (
             <div>
-              <Link href={"/api/auth/authentication"} className="text-xl">
+              <Link
+                href={"/api/auth/authentication"}
+                className="rounded-md bg-black/10 px-3 py-2 text-lg backdrop-blur-3xl hover:bg-black/20 transition-all ease-linear "
+              >
                 SignIn
               </Link>
             </div>

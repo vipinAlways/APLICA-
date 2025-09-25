@@ -38,6 +38,14 @@ export const authConfig = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        await db.userPlan.upsert({
+          where: { userId: user.id },
+          update: {}, 
+          create: {
+            planType: "BASE",
+            userId: user.id!,
+          },
+        });
         await clearVerificationTokens();
         return {
           ...token,

@@ -1,5 +1,6 @@
 "use client";
 import { Building, DollarSign, MapPin, Search } from "lucide-react";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -17,12 +18,17 @@ import {
 import { api } from "~/trpc/react";
 
 const page = () => {
-  const [user] = api.user.bookmarkJobs.useSuspenseQuery();
-
+  const [jobs] = api.user.bookmarkJobs.useSuspenseQuery();
+  if(!jobs || !jobs.JobCard){
+    return <p>No data find</p>
+  }
   return (
     <div className="h-full w-full">
-      {user.JobCard.length > 0 ? (
-        user.JobCard.map((job) => (
+      <Head>
+        <title>Aplica</title>
+      </Head>
+      {jobs.JobCard.length > 0 ? (
+        jobs.JobCard.map((job) => (
           <Card className="w-full max-w-xl rounded-2xl shadow-md" key={job.id}>
             <CardHeader className="flex flex-row items-center gap-4">
               {job?.employer_logo ? (
@@ -96,10 +102,13 @@ const page = () => {
           </Card>
         ))
       ) : (
-        <div className="text-muted-foreground flex h-full w-full flex-col items-center justify-center gap-2 mt-10">
+        <div className="text-muted-foreground mt-10 flex h-full w-full flex-col items-center justify-center gap-2">
           <p className="flex-1 text-2xl">No bookmarks</p>
 
-          <Link href={"/find"} className="flex w-fit flex-1 items-center gap-1 text-lg">
+          <Link
+            href={"/find"}
+            className="flex w-fit flex-1 items-center gap-1 text-lg"
+          >
             <span> Search Some</span> <Search className="size-5" />
           </Link>
         </div>

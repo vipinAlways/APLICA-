@@ -278,7 +278,7 @@ export const pdfRoute = createTRPCRouter({
         },
         select: {
           userResumeText: true,
-          plan: true,
+          UserPlan: true,
         },
       });
 

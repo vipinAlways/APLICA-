@@ -2,11 +2,16 @@
 import {
   useStripe,
   useElements,
-  PaymentElement,
 } from "@stripe/react-stripe-js";
 import React, { useState } from "react";
 
-const CheckOutPage = ({ amount ,handleSubmit}: { amount: number,handleSubmite:()=>void }) => {
+const CheckOutPage = ({
+  amount,
+  handleSubmit,
+}: {
+  amount: number;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState<boolean>(false);
@@ -42,9 +47,7 @@ const CheckOutPage = ({ amount ,handleSubmit}: { amount: number,handleSubmite:()
 
   return (
     <form onSubmit={handleSubmit} className="rounded-md bg-white p-4">
-      {
-        
-      }
+      {}
 
       {errorMessage && (
         <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">

@@ -24,7 +24,7 @@ export const User = createTRPCRouter({
           },
           data: {
             name: input.userName,
-            password: input.password,
+            // password: input.password,
           },
         });
 
@@ -98,13 +98,10 @@ export const User = createTRPCRouter({
           JobCard: true,
         },
       });
-      if (!markedJobs) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Not have any mark Jobs",
-        });
-      }
-      return markedJobs;
+
+      return {
+        JobCard: markedJobs?.JobCard ? markedJobs.JobCard : [],
+      };
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
