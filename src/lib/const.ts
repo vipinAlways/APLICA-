@@ -1,3 +1,5 @@
+import { types } from "@prisma/client";
+
 export const promptForSuggestions = `You are a resume improvement assistant. Analyze the resume and return JSON with these exact keys:
 
 {
@@ -56,3 +58,24 @@ Rules:
 - Optimize the structure: include greeting, introduction, relevant skills/experience, and a polite closing.
 - The value for "coverLetter" must always be a single string.
 `;
+
+export const planFeatures = {
+  [types.BASE]: {
+    maxCoverLetters: 10,
+    maxEmails: 10,
+    maxScores: 10,
+    resumeUpload:10
+  },
+  [types.MEDIUM]: {
+    maxCoverLetters: 100,
+    maxEmails: 100,
+    maxScores: 100,
+    resumeUpload:100
+  },
+  [types.PRO]: {
+    maxCoverLetters: 888888888,
+    maxEmails: 888888888,
+    maxScores: 888888888,
+    resumeUpload:8888888,
+  },
+} as const;

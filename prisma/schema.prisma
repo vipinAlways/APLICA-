@@ -54,6 +54,7 @@ model User {
     numberOfCoverLetter Int       @default(0)
     numberOfEmail       Int       @default(0)
     numberOfScore       Int       @default(0)
+    resumeUpload        Int       @default(0)
 }
 
 enum types {

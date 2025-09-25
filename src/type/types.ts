@@ -48,3 +48,9 @@ export interface JobCardProps {
   job_publisher: string;
   job_apply_link: string;
 }
+
+export interface planFeatures {
+  [types: string]: {
+    coverLetter:string        
+  };
+}

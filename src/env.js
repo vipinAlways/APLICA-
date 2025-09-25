@@ -17,8 +17,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN: z.string(),
     SAMBANOVA_API_KEY: z.string(),
-
+    // STRIPE_PUBLIC_KEY: z.string(),
     RAPIDAPI_KEY: z.string(),
+    STRIPE_SECRET_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -44,9 +45,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     SAMBANOVA_API_KEY: process.env.SAMBANOVA_API_KEY,
-
+    // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
     RAPIDAPI_KEY: process.env.RAPIDAPI_KEY,
     NODE_ENV: process.env.NODE_ENV,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

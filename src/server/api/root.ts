@@ -3,6 +3,7 @@ import { jobsRoute } from "~/trpc/FetchJobs";
 import { locations } from "~/trpc/locations";
 import { pdfRoute } from "~/trpc/ai";
 import { User } from "~/trpc/User";
+import { paymentRoute } from "~/trpc/createPaymentIntent";
 
 /**
  * This is the primary router for your server.
@@ -13,7 +14,8 @@ export const appRouter = createTRPCRouter({
   user: User,
   pdfRoute: pdfRoute,
   getjobs: jobsRoute,
-  locatiosns:locations
+  locatiosns: locations,
+  payment: paymentRoute,
 });
 
 // export type definition of API

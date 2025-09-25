@@ -278,6 +278,7 @@ export const pdfRoute = createTRPCRouter({
         },
         select: {
           userResumeText: true,
+          plan: true,
         },
       });
 
@@ -288,6 +289,7 @@ export const pdfRoute = createTRPCRouter({
         });
       }
 
+      // const max =
       if (!user.userResumeText) {
         return null;
       }
