@@ -1,4 +1,5 @@
 import { PlanType } from "@prisma/client";
+import { Princess_Sofia } from "next/font/google";
 
 export const promptForSuggestions = `You are a resume improvement assistant. Analyze the resume and return JSON with these exact keys:
 
@@ -61,23 +62,40 @@ Rules:
 
 export const planFeatures = [
   {
-    planType: PlanType.BASE,
-    maxCoverLetters: 10,
-    maxEmails: 10,
-    maxScores: 10,
-    resumeUpload: 10,
+    plan: PlanType.BASE,
+    price: 0,
+    features: [
+      {
+        maxCoverLetters: 10,
+      },
+      { maxEmails: 10 },
+      { maxScores: 10 },
+      { resumeUpload: 10 },
+    ],
   },
   {
-    maxCoverLetters: 100,
-    maxEmails: 100,
-    maxScores: 100,
-    resumeUpload: 100,
+    plan: PlanType.PRO,
+    price: 40,
+    features: [
+      {
+        maxCoverLetters: 100,
+      },
+      { maxEmails: 100 },
+      { maxScores: 100 },
+      { resumeUpload: 100 },
+    ],
   },
   {
-    plantype: PlanType.ELITE,
-    maxCoverLetters: 888888888,
-    maxEmails: 888888888,
-    maxScores: 888888888,
-    resumeUpload: 8888888,
+    plan: PlanType.ELITE,
+    price: 100,
+    features: [
+      {
+        maxCoverLetters: Infinity,
+      },
+      { maxEmails: Infinity },
+      { maxScores: Infinity },
+      { resumeUpload: Infinity },
+      ,
+    ],
   },
 ];

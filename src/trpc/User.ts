@@ -223,4 +223,22 @@ export const User = createTRPCRouter({
       },
     });
   }),
+
+  userPlanDetails: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.session) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Please login",
+      });
+    } else {
+      return await ctx.db.user.findFirst({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          UserPlan: true,
+        },
+      });
+    }
+  }),
 });

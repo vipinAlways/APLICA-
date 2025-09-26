@@ -36,13 +36,13 @@ import { useIsMobile } from "~/hooks/use-mobile";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Nav = () => {
   const session = useSession();
   const isMobile = useIsMobile();
   const pathName = usePathname();
-  const route = useRouter();
+
   return (
     <nav className="group w-full text-zinc-900">
       <div className="flex w-full items-center justify-between rounded-lg p-0.5 text-lg backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40 md:p-2 md:text-2xl">
@@ -168,16 +168,14 @@ const Nav = () => {
                     Logout
                     <LogOut className="size-4 shrink-0" />
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      route.push("/billing");
-                      toast("Coming Soon");
-                    }}
-                    className="courser-pointer flex items-center justify-between"
-                  >
-                    Billing
-                    <CreditCardIcon className="size-4 text-black" />
+                  <DropdownMenuItem>
+                    <Link
+                      href={"/billing"}
+                      className="courser-pointer flex w-full items-center justify-between"
+                    >
+                      Billing
+                      <CreditCardIcon className="size-4 text-black" />
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -186,7 +184,7 @@ const Nav = () => {
             <div>
               <Link
                 href={"/api/auth/authentication"}
-                className="rounded-md bg-black/10 px-3 py-2 text-lg backdrop-blur-3xl hover:bg-black/20 transition-all ease-linear "
+                className="rounded-md bg-black/10 px-3 py-2 text-lg backdrop-blur-3xl transition-all ease-linear hover:bg-black/20"
               >
                 SignIn
               </Link>
