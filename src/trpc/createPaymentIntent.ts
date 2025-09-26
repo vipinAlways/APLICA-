@@ -22,7 +22,7 @@ export const paymentRoute = createTRPCRouter({
 
         const updateUserPlan = await ctx.db.userPlan.update({
           where: {
-            id: ctx.session.user.id,
+            userId: ctx.session.user.id,
           },
           data: {
             planType: input.userPlan,

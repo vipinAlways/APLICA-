@@ -78,11 +78,11 @@ export const planFeatures = [
     price: 40,
     features: [
       {
-        maxCoverLetters: 100,
+        maxCoverLetters: 1000,
       },
-      { maxEmails: 100 },
-      { maxScores: 100 },
-      { resumeUpload: 100 },
+      { maxEmails: 1000 },
+      { maxScores: 1000 },
+      { resumeUpload: 50 },
     ],
   },
   {
