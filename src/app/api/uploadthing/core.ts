@@ -5,7 +5,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   pdfformUser: f({ pdf: { maxFileSize: "1MB" } }).onUploadComplete(
-    async ({ file }) => {
+    async () => {
       console.log("file uploaded");
     },
   ),

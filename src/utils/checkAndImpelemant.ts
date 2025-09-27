@@ -26,8 +26,15 @@ export const checkAndImpelement = async ({
         userId,
       },
     });
+
+    if (!userPlan) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "cannot find any active plan",
+      });
+    }
     const maxLimit = planFeatures.find(
-      (plan) => plan.plan === (userPlan?.planType as PlanType),
+      (plan) => plan.plan === (userPlan.planType as PlanType),
     )?.features[feature];
 
     if (!maxLimit) {

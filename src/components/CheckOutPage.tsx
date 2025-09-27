@@ -35,6 +35,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       }
     } catch (err) {
       setErrorMessage("An unexpected error occurred");
+      console.log(err);
     } finally {
       setLoading(false);
     }

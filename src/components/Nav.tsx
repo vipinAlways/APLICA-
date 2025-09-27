@@ -38,14 +38,27 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { api } from "~/trpc/react";
 import { planFeatures } from "~/lib/const";
-import type { PlanType } from "@prisma/client";
+
 import { Progress } from "./ui/progress";
+import { cn } from "~/lib/utils";
 
 const Nav = () => {
   const isMobile = useIsMobile();
+  const session = useSession();
   const pathName = usePathname();
-  const [userPlanDetails] = api.user.userPlanDetails.useSuspenseQuery();
-  const [user] = api.user.existingUser.useSuspenseQuery();
+
+  const { data: userPlanDetails, isLoading: isPlanLoading } =
+    api.user?.userPlanDetails.useQuery(undefined, {
+      enabled: session.status === "authenticated",
+      retry: 1,
+    });
+
+  const { data: user, isLoading: isUserLoading } =
+    api.user?.existingUser?.useQuery(undefined, {
+      enabled: session.status === "authenticated",
+      retry: 1,
+    });
+
   const fallbackAvatar =
     "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
@@ -58,6 +71,22 @@ const Nav = () => {
       .toUpperCase();
   };
 
+  const isLoading =
+    session.status === "loading" ||
+    (session.status === "authenticated" && (isPlanLoading || isUserLoading));
+
+  const getCurrentPlanFeatures = () => {
+    if (!userPlanDetails?.UserPlan?.planType || !user) {
+      return null;
+    }
+
+    return planFeatures.find(
+      (plan) => userPlanDetails.UserPlan?.planType === plan.plan,
+    )?.features;
+  };
+
+  const currentPlanFeatures = getCurrentPlanFeatures();
+
   return (
     <nav className="group w-full text-zinc-900">
       <div className="flex w-full items-center justify-between rounded-lg p-0.5 text-lg backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40 md:p-2 md:text-2xl">
@@ -66,25 +95,25 @@ const Nav = () => {
         </Link>
 
         <div className="flex w-fit items-center justify-center gap-1 md:w-80">
-          {!user ? (
+          {isLoading ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
-          ) : user ? (
+          ) : session.status === "authenticated" ? (
             isMobile ? (
               <Drawer>
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
                     <AvatarImage
-                      src={user.image ?? fallbackAvatar}
-                      alt={user.name ?? "User avatar"}
+                      src={user?.image ?? fallbackAvatar}
+                      alt={user?.name ?? "User avatar"}
                     />
                     <AvatarFallback className="text-lg">
-                      {getInitials(user.name)}
+                      {getInitials(user?.name)}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {user.name ?? "User"}
+                      {user?.name ?? "User"}
                     </p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
@@ -92,17 +121,16 @@ const Nav = () => {
 
                 <DrawerContent>
                   <DrawerHeader>
-                    <DrawerTitle>{user.name ?? ""}</DrawerTitle>
-                    <DrawerDescription>{user.email}</DrawerDescription>
+                    <DrawerTitle>{user?.name ?? ""}</DrawerTitle>
+                    <DrawerDescription>{user?.email}</DrawerDescription>
                   </DrawerHeader>
 
                   <DrawerFooter className="flex gap-2">
-                    <Button
-                      variant={"outline"}
-                      onClick={() => toast("Coming Soon")}
-                    >
-                      <CreditCardIcon className="size-4 text-black" />
-                      Billing
+                    <Button variant={"outline"} asChild>
+                      <Link href="/billing">
+                        <CreditCardIcon className="size-4 text-black" />
+                        Billing
+                      </Link>
                     </Button>
                     <Button
                       variant={"outline"}
@@ -128,19 +156,19 @@ const Nav = () => {
                 <DropdownMenuTrigger className="border-border/20 flex w-72 items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
                     <AvatarImage
-                      src={user.image ?? fallbackAvatar}
-                      alt={user.name ?? "User avatar"}
+                      src={user?.image ?? fallbackAvatar}
+                      alt={user?.name ?? "User avatar"}
                     />
                     <AvatarFallback className="text-lg">
-                      {getInitials(user.name)}
+                      {getInitials(user?.name)}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {user.name ?? "User"}
+                      {user?.name ?? "User"}
                     </p>
-                    <p className="w-full truncate text-xs">{user.email}</p>
+                    <p className="w-full truncate text-xs">{user?.email}</p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
                 </DropdownMenuTrigger>
@@ -152,10 +180,10 @@ const Nav = () => {
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-1">
                       <span className="truncate font-medium">
-                        {user.name ?? "User"}
+                        {user?.name ?? "User"}
                       </span>
                       <span className="text-muted-foreground truncate text-sm font-normal">
-                        {user.email ?? "Email"}
+                        {user?.email ?? "Email"}
                       </span>
                     </div>
                   </DropdownMenuLabel>
@@ -188,38 +216,56 @@ const Nav = () => {
                       <CreditCardIcon className="size-4 text-black" />
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex flex-col items-start px-4">
-                    <h5 className="mb-2 font-medium">Limits</h5>
 
-                    {planFeatures.find(
-                      (plan) =>
-                        userPlanDetails?.UserPlan?.planType === plan.plan,
-                    )?.features &&
-                      Object.entries(
-                        planFeatures.find(
-                          (plan) =>
-                            userPlanDetails?.UserPlan?.planType === plan.plan,
-                        )!.features,
-                      ).map(([key, value]) => {
-                        const usage = user?.[key as keyof typeof user] ?? 0;
-                        const percentage =
-                          value === Infinity
-                            ? 100
-                            : Math.min(((usage as number) / value) * 100, 100);
-                        return (
-                          <div key={key} className="mb-2 w-full space-y-1.5">
-                            <div className="flex justify-between text-sm">
-                              <span className="capitalize">{key}</span>
-                              <span>
-                                {usage as string} /{" "}
-                                {value === Infinity ? "∞" : value}
-                              </span>
+                  {/* Only show limits if user has a plan and features exist */}
+                  {currentPlanFeatures && (
+                    <DropdownMenuItem className="flex flex-col items-start px-4">
+                      <h5 className="mb-2 font-medium">Limits</h5>
+                      {Object.entries(currentPlanFeatures).map(
+                        ([key, value]) => {
+                          // Safely get usage with fallback
+                          const usage = (user as any)?.[key] ?? 0;
+                          const percentage =
+                            value === Infinity
+                              ? 100
+                              : Math.min(
+                                  (Number(usage) / Number(value)) * 100,
+                                  100,
+                                );
+
+                          return (
+                            <div key={key} className="mb-2 w-full space-y-1.5">
+                              <div className="flex justify-between text-sm">
+                                <span className="capitalize">
+                                  {key.replace(/([A-Z])/g, " $1").trim()}
+                                </span>
+                                <span>
+                                  {String(usage)} /{" "}
+                                  {value === Infinity ? "∞" : String(value)}
+                                </span>
+                              </div>
+                              <Progress value={percentage}  className={cn(percentage >90 && "bg-red-600")}/>
                             </div>
-                            <Progress value={percentage} />
-                          </div>
-                        );
-                      })}
-                  </DropdownMenuItem>
+                          );
+                        },
+                      )}
+                    </DropdownMenuItem>
+                  )}
+
+                  {!userPlanDetails?.UserPlan && (
+                    <DropdownMenuItem className="flex flex-col items-start px-4">
+                      <h5 className="mb-2 font-medium">No Active Plan</h5>
+                      <p className="text-muted-foreground text-sm">
+                        <Link
+                          href="/billing"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Choose a plan
+                        </Link>{" "}
+                        to start using features
+                      </p>
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )
@@ -235,7 +281,7 @@ const Nav = () => {
           )}
 
           <Link href={"/bookmark"}>
-            {pathName === "bookmark" ? (
+            {pathName === "/bookmark" ? (
               <BookmarkCheck className="size-6" />
             ) : (
               <Bookmark className="size-6" />

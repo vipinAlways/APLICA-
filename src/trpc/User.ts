@@ -42,15 +42,9 @@ export const User = createTRPCRouter({
 
       if (existingUser) {
         return existingUser;
-      } else {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Not able to find user",
-        });
-      }
+      } 
     } catch (error) {
-      console.error("Error checking existing user:", error);
-      throw new Error("Failed to check existing user");
+      throw new Error("Failed to check existing user",{cause:error});
     }
   }),
   uplaodResume: protectedProcedure

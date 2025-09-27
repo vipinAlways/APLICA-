@@ -14,17 +14,19 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [activeTab, setActiveTab] = useState("fitscore"); // normalized default
   const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
+
+  const utils = api.useUtils();
   const {
     mutate: fitScoreMutate,
     isPending,
     data: fitData,
   } = api.pdfRoute.AccordingToJob.useMutation({
     mutationKey: ["getFitScore"],
-    onSuccess: () => toast("here what you want"),
+    onSuccess: async () => {
+      await utils.user.existingUser.invalidate();
+      toast("here what you want");
+    },
   });
-
-
-
 
   const {
     mutate: emailMutate,
@@ -32,8 +34,10 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     data: emaildata,
   } = api.pdfRoute.createEmailAccToJob.useMutation({
     mutationKey: ["getEmail", job.job_title, job.job_description],
-    onSuccess: () => {
+    onSuccess: async () => {
       setEmail(emaildata?.parsed.email ?? "");
+
+      await utils.user.existingUser.invalidate();
       toast("Here is your Email");
     },
   });
@@ -44,8 +48,10 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     data: coverLetterData,
   } = api.pdfRoute.createCoverLetter.useMutation({
     mutationKey: ["getCoverLetter", job.job_title, job.job_description],
-    onSuccess: () => {
+    onSuccess: async () => {
       setCoverLetter(coverLetterData?.coverLetter ?? "");
+
+      await utils.user.existingUser.invalidate();
       toast("Here is your cover letter");
     },
   });
@@ -267,7 +273,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               <span className="font-semibold underline">Role :</span>{" "}
               <span>{job.job_title}</span>
             </h2>
-            <h4>
+            <h4>    
               Expected Salary {job.job_salary_min} - {job.job_salary_max}
             </h4>
             <h4>Location &#128205; {job.job_location}</h4>

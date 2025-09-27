@@ -5,7 +5,6 @@ import {
   Loader2,
   MousePointerSquareDashed,
   RocketIcon,
-  Terminal,
 } from "lucide-react";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import Dropzone, { type FileRejection } from "react-dropzone";
@@ -18,14 +17,12 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import Link from "next/link";
 
@@ -44,7 +41,7 @@ const UploadResume = () => {
       onSuccess: async () => {
         await utils.user.existingUser.invalidate();
 
-        router.push("/find");
+        router.push("/find-job");
       },
       onError: (error) => {
         console.log("error.data.code", error?.data?.code);
@@ -91,7 +88,7 @@ const UploadResume = () => {
     }
 
     if (user?.Resume && !pdfFile) {
-      router.push("/find");
+      router.push("/find-job");
       return;
     }
 
@@ -137,7 +134,7 @@ const UploadResume = () => {
             src={
               pdfFile && pdfFile.length > 0
                 ? URL.createObjectURL(pdfFile[0]!)
-                : user.Resume!
+                : (user?.Resume ?? "")
             }
             className="h-72 w-4/5 rounded-md"
             loading="lazy"

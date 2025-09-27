@@ -1,18 +1,13 @@
-"use client";
 import React, { lazy, Suspense } from "react";
 import Loader from "~/components/Loader";
 
-
 const FindComp = lazy(() => import("~/components/Find"));
-
-const Page = () => {
+const page = () => {
   return (
-    <Suspense fallback={<Loader/>}>
+    <Suspense fallback={<Loader />}>
       <FindComp />
     </Suspense>
   );
 };
 
-export default Page;
-
-
+export default page;

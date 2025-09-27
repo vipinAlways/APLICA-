@@ -323,8 +323,6 @@ export const pdfRoute = createTRPCRouter({
         const parsedJson = JSON.parse(cleanedOutput) as promptForJobFitResponse;
         aiResult = promptForJobFitSchema.parse(parsedJson);
       } catch (parseError) {
-        console.error("Invalid AI response:", rawOutput);
-
         const fallbackResult = extractFallbackData(
           rawOutput,
           "jobfit",
@@ -335,6 +333,7 @@ export const pdfRoute = createTRPCRouter({
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "AI returned invalid response format. Please try again.",
+            cause: parseError,
           });
         }
       }
@@ -450,8 +449,6 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
     )
     .mutation(async ({ ctx, input }) => {
       const { jobdescription, jobrole } = input;
-
-      const session = await auth();
 
       await checkAndImpelement({
         userId: ctx.session?.user.id ?? "",
