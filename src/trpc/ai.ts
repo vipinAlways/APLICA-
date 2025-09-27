@@ -28,6 +28,7 @@ import {
   ResumeSchema,
 } from "~/lib/scheama";
 import { extractFallbackData, parsePdf } from "~/utils/helper";
+import { checkAndImpelement } from "~/utils/checkAndImpelemant";
 
 async function streamPdfToFile(url: string, destPath: string): Promise<void> {
   const response = await fetch(url);
@@ -121,23 +122,17 @@ export const pdfRoute = createTRPCRouter({
       const fileName = uuidv4();
       const tempFilePath = path.join(os.tmpdir(), `${fileName}.pdf`);
 
+      if (!input.pdfUrl) {
+        return {
+          success: true,
+          message: "Resume already improved",
+        };
+      }
+      await checkAndImpelement({
+        userId: ctx.session?.user.id ?? "",
+        feature: "resumeUpload",
+      });
       try {
-        const session = await auth();
-
-        if (!session?.user?.id) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "User must be authenticated",
-          });
-        }
-
-        if (!input.pdfUrl) {
-          return {
-            success: true,
-            message: "Resume already improved",
-          };
-        }
-
         await withTimeout(() => streamPdfToFile(pdfUrl, tempFilePath), 20_000);
 
         const parsedText = await withTimeout(
@@ -172,8 +167,9 @@ export const pdfRoute = createTRPCRouter({
         const rawOutput = completion.choices?.[0]?.message?.content?.trim();
 
         if (!rawOutput) {
+          console.log("rawopoutone");
           throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
+            code: "UNPROCESSABLE_CONTENT",
             message: "AI service returned empty response",
           });
         }
@@ -219,7 +215,7 @@ export const pdfRoute = createTRPCRouter({
         }
 
         await ctx.db.user.update({
-          where: { id: session.user.id },
+          where: { id: ctx.session?.user.id },
           data: {
             SuggestedResume: aiResult.polished_resume,
             suggestion: aiResult.skills_to_learn,
@@ -227,6 +223,7 @@ export const pdfRoute = createTRPCRouter({
             field: aiResult.field || "General",
             Resume: input.pdfUrl,
             userResumeText: parsedText,
+            resumeUpload: { increment: 1 },
           },
         });
 
@@ -235,11 +232,7 @@ export const pdfRoute = createTRPCRouter({
           message: "Resume successfully analyzed and improved",
         };
       } catch (error) {
-        console.error("Error in textextractAndImproveMent:", error);
-
-        if (error instanceof TRPCError) {
-          throw error;
-        }
+        if (error instanceof TRPCError) throw error;
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -289,7 +282,6 @@ export const pdfRoute = createTRPCRouter({
         });
       }
 
-      // const max =
       if (!user.userResumeText) {
         return null;
       }
@@ -336,7 +328,6 @@ export const pdfRoute = createTRPCRouter({
         aiResult = promptForJobFitSchema.parse(parsedJson);
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
-        console.error("Parse error:", parseError);
 
         const fallbackResult = extractFallbackData(
           rawOutput,

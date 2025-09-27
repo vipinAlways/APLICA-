@@ -1,6 +1,12 @@
 "use client";
 
-import { File, Loader2, MousePointerSquareDashed } from "lucide-react";
+import {
+  File,
+  Loader2,
+  MousePointerSquareDashed,
+  RocketIcon,
+  Terminal,
+} from "lucide-react";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import Dropzone, { type FileRejection } from "react-dropzone";
 import { toast } from "sonner";
@@ -10,6 +16,18 @@ import { generateReactHelpers } from "@uploadthing/react";
 import type { OurFileRouter } from "~/app/api/uploadthing/core";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import Link from "next/link";
 
 const { useUploadThing: useUT } = generateReactHelpers<OurFileRouter>();
 
@@ -20,13 +38,21 @@ const UploadResume = () => {
   const utils = api.useUtils();
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
-
+  const [showLimitAlert, setShowLimitAlert] = useState(true);
   const { mutate, isPending } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       onSuccess: async () => {
         await utils.user.existingUser.invalidate();
-        console.log("hoa kya nahi hua");
+
         router.push("/find");
+      },
+      onError: (error) => {
+        console.log("error.data.code", error?.data?.code);
+        if (error?.data?.code === "TOO_MANY_REQUESTS") {
+          setShowLimitAlert(true);
+        } else {
+          toast.error(error.message ?? "Something went wrong");
+        }
       },
     });
 
@@ -64,7 +90,6 @@ const UploadResume = () => {
       });
     }
 
-    // If user already has a resume → skip upload
     if (user?.Resume && !pdfFile) {
       router.push("/find");
       return;
@@ -83,6 +108,29 @@ const UploadResume = () => {
 
   return (
     <Suspense fallback={<Loader2 className="size-6 animate-spin" />}>
+      <AlertDialog open={showLimitAlert} onOpenChange={setShowLimitAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span>
+                You have reached your limit for this feature. Upgrade your plan
+                to continue.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Link
+              href={"/billing"}
+              className="bg-muted flex gap-2 rounded-md p-1.5 text-black"
+            >
+              Upgrade <RocketIcon className="size-4" />{" "}
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="w-full">
         <div className="mb-4 flex w-full justify-center">
           <iframe

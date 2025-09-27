@@ -31,7 +31,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       });
 
       if (error) {
-        setErrorMessage(error.message || "Payment failed");
+        setErrorMessage(error.message ?? "Payment failed");
       }
     } catch (err) {
       setErrorMessage("An unexpected error occurred");

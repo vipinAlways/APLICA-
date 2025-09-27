@@ -86,18 +86,14 @@ const Page = () => {
             <h2 className="w-full text-center text-5xl">$ {plan.price}</h2>
             <div className="flex flex-col gap-2 p-2">
               <ul className="list-inside list-disc space-y-2">
-                {plan.features.map((feature, idx) => {
-                  const [key, value] = Object.entries(feature!)[0] ?? [];
-                  if (!key) return null;
-                  return (
-                    <li key={idx}>
-                      <span className="text-base font-medium capitalize">
-                        {key}
-                      </span>
-                      : {value}
-                    </li>
-                  );
-                })}
+                {Object.entries(plan.features).map(([key, value]) => (
+                  <li key={key}>
+                    <span className="text-base font-medium capitalize">
+                      {key}
+                    </span>
+                    : {value}
+                  </li>
+                ))}
               </ul>
             </div>
 

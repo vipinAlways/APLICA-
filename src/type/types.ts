@@ -51,6 +51,13 @@ export interface JobCardProps {
 
 export interface planFeatures {
   [types: string]: {
-    coverLetter:string        
+    coverLetter: string;
   };
+}
+
+export interface featureTypes {
+  numberOfCoverLetter: number;
+  numberOfEmail: number;
+  numberOfScore: number;
+  resumeUpload: number;
 }

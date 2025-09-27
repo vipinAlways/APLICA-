@@ -1,5 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { NextResponse } from "next/server";
 import z from "zod";
 import { stripe } from "~/lib/stripe";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -20,7 +19,7 @@ export const paymentRoute = createTRPCRouter({
           automatic_payment_methods: { enabled: true },
         });
 
-        const updateUserPlan = await ctx.db.userPlan.update({
+        await ctx.db.userPlan.update({
           where: {
             userId: ctx.session.user.id,
           },

@@ -19,7 +19,7 @@ import { api } from "~/trpc/react";
 
 const page = () => {
   const [jobs] = api.user.bookmarkJobs.useSuspenseQuery();
-  if(!jobs || !jobs.JobCard){
+  if(!jobs){
     return <p>No data find</p>
   }
   return (

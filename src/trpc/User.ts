@@ -100,7 +100,7 @@ export const User = createTRPCRouter({
       });
 
       return {
-        JobCard: markedJobs?.JobCard ? markedJobs.JobCard : [],
+        JobCard: markedJobs?.JobCard ?? [],
       };
     } catch (error) {
       throw new TRPCError({
