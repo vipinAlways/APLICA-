@@ -38,7 +38,7 @@ const UploadResume = () => {
   const utils = api.useUtils();
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
-  const [showLimitAlert, setShowLimitAlert] = useState(true);
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
   const { mutate, isPending } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       onSuccess: async () => {

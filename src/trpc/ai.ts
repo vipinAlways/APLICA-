@@ -256,18 +256,14 @@ export const pdfRoute = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { jobTitle, jobDescription } = input;
 
-      const session = await auth();
-
-      if (!session?.user?.id) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User must be authenticated",
-        });
-      }
+      await checkAndImpelement({
+        userId: ctx.session?.user.id ?? "",
+        feature: "numberOfScore",
+      });
 
       const user = await ctx.db.user.findFirst({
         where: {
-          id: session.user.id,
+          id: ctx.session?.user.id,
         },
         select: {
           userResumeText: true,
@@ -356,18 +352,13 @@ export const pdfRoute = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { jobdescription, jobrole } = input;
 
-      const session = await auth();
-
-      if (!session) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User is not authenticated",
-        });
-      }
-
+      await checkAndImpelement({
+        userId: ctx.session?.user.id ?? "",
+        feature: "numberOfEmail",
+      });
       const user = await ctx.db.user.findFirst({
         where: {
-          id: session?.user.id,
+          id: ctx.session?.user.id,
         },
         select: {
           userResumeText: true,
@@ -462,16 +453,13 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
 
       const session = await auth();
 
-      if (!session) {
-        new TRPCError({
-          code: "NOT_FOUND",
-          message: "user is not authenticate",
-        });
-      }
-
+      await checkAndImpelement({
+        userId: ctx.session?.user.id ?? "",
+        feature: "numberOfCoverLetter",
+      });
       const user = await ctx.db.user.findFirst({
         where: {
-          id: session?.user.id,
+          id: ctx.session?.user.id,
         },
         select: {
           userResumeText: true,

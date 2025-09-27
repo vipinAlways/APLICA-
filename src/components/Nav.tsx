@@ -1,27 +1,27 @@
 "use client";
-import React from "react";
-import { useSession } from "next-auth/react";
 
-import { signOut } from "next-auth/react";
+import React from "react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-
 import {
   Drawer,
+  DrawerTrigger,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  DrawerDescription,
+  DrawerFooter,
 } from "~/components/ui/drawer";
 
 import {
@@ -32,16 +32,31 @@ import {
   Loader2Icon,
   LogOut,
 } from "lucide-react";
+
 import { useIsMobile } from "~/hooks/use-mobile";
-import { Avatar, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { api } from "~/trpc/react";
+import { planFeatures } from "~/lib/const";
+import type { PlanType } from "@prisma/client";
+import { Progress } from "./ui/progress";
 
 const Nav = () => {
-  const session = useSession();
   const isMobile = useIsMobile();
   const pathName = usePathname();
+  const [userPlanDetails] = api.user.userPlanDetails.useSuspenseQuery();
+  const [user] = api.user.existingUser.useSuspenseQuery();
+  const fallbackAvatar =
+    "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
 
   return (
     <nav className="group w-full text-zinc-900">
@@ -49,25 +64,27 @@ const Nav = () => {
         <Link href={"/"}>
           <i>Aplica-</i>
         </Link>
+
         <div className="flex w-fit items-center justify-center gap-1 md:w-80">
-          {session.status === "loading" ? (
+          {!user ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
-          ) : session.data ? (
+          ) : user ? (
             isMobile ? (
               <Drawer>
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
                     <AvatarImage
-                      src={session.data.user.image!}
-                      alt="avatar"
-                      className="rounded-full"
+                      src={user.image ?? fallbackAvatar}
+                      alt={user.name ?? "User avatar"}
                     />
+                    <AvatarFallback className="text-lg">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {" "}
-                      {session.data.user.name ?? "User"}
+                      {user.name ?? "User"}
                     </p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
@@ -75,18 +92,14 @@ const Nav = () => {
 
                 <DrawerContent>
                   <DrawerHeader>
-                    <DrawerTitle>{session.data.user.name ?? ""}</DrawerTitle>
-                    <DrawerDescription>
-                      {session.data.user.email}
-                    </DrawerDescription>
+                    <DrawerTitle>{user.name ?? ""}</DrawerTitle>
+                    <DrawerDescription>{user.email}</DrawerDescription>
                   </DrawerHeader>
 
-                  <DrawerFooter>
+                  <DrawerFooter className="flex gap-2">
                     <Button
                       variant={"outline"}
-                      onClick={() => {
-                        toast("Coming Soon");
-                      }}
+                      onClick={() => toast("Coming Soon")}
                     >
                       <CreditCardIcon className="size-4 text-black" />
                       Billing
@@ -97,10 +110,7 @@ const Nav = () => {
                         e.preventDefault();
                         e.stopPropagation();
                         try {
-                          await signOut({
-                            callbackUrl: "/",
-                            redirect: true,
-                          });
+                          await signOut({ callbackUrl: "/", redirect: true });
                         } catch (error) {
                           console.error("Logout failed:", error);
                           toast.error("Failed to logout. Please try again.");
@@ -117,17 +127,20 @@ const Nav = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger className="border-border/20 flex w-72 items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
-                    <AvatarImage src={session.data.user.image ?? ""} />
+                    <AvatarImage
+                      src={user.image ?? fallbackAvatar}
+                      alt={user.name ?? "User avatar"}
+                    />
+                    <AvatarFallback className="text-lg">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {" "}
-                      {session.data.user.name ?? "User"}
+                      {user.name ?? "User"}
                     </p>
-                    <p className="w-full truncate text-xs">
-                      {session.data.user.email}
-                    </p>
+                    <p className="w-full truncate text-xs">{user.email}</p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
                 </DropdownMenuTrigger>
@@ -139,10 +152,10 @@ const Nav = () => {
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-1">
                       <span className="truncate font-medium">
-                        {session.data.user.name ?? "user"}
+                        {user.name ?? "User"}
                       </span>
                       <span className="text-muted-foreground truncate text-sm font-normal">
-                        {session.data.user.email ?? "Email"}
+                        {user.email ?? "Email"}
                       </span>
                     </div>
                   </DropdownMenuLabel>
@@ -150,15 +163,12 @@ const Nav = () => {
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
-                    className="courser-pointer flex items-center justify-between"
+                    className="flex cursor-pointer items-center justify-between"
                     onClick={async (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       try {
-                        await signOut({
-                          callbackUrl: "/",
-                          redirect: true,
-                        });
+                        await signOut({ callbackUrl: "/", redirect: true });
                       } catch (error) {
                         console.error("Logout failed:", error);
                         toast.error("Failed to logout. Please try again.");
@@ -168,14 +178,47 @@ const Nav = () => {
                     Logout
                     <LogOut className="size-4 shrink-0" />
                   </DropdownMenuItem>
+
                   <DropdownMenuItem>
                     <Link
                       href={"/billing"}
-                      className="courser-pointer flex w-full items-center justify-between"
+                      className="flex w-full cursor-pointer items-center justify-between"
                     >
                       Billing
                       <CreditCardIcon className="size-4 text-black" />
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex flex-col items-start px-4">
+                    <h5 className="mb-2 font-medium">Limits</h5>
+
+                    {planFeatures.find(
+                      (plan) =>
+                        userPlanDetails?.UserPlan?.planType === plan.plan,
+                    )?.features &&
+                      Object.entries(
+                        planFeatures.find(
+                          (plan) =>
+                            userPlanDetails?.UserPlan?.planType === plan.plan,
+                        )!.features,
+                      ).map(([key, value]) => {
+                        const usage = user?.[key as keyof typeof user] ?? 0;
+                        const percentage =
+                          value === Infinity
+                            ? 100
+                            : Math.min(((usage as number) / value) * 100, 100);
+                        return (
+                          <div key={key} className="mb-2 w-full space-y-1.5">
+                            <div className="flex justify-between text-sm">
+                              <span className="capitalize">{key}</span>
+                              <span>
+                                {usage as string} /{" "}
+                                {value === Infinity ? "∞" : value}
+                              </span>
+                            </div>
+                            <Progress value={percentage} />
+                          </div>
+                        );
+                      })}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -186,10 +229,11 @@ const Nav = () => {
                 href={"/api/auth/authentication"}
                 className="rounded-md bg-black/10 px-3 py-2 text-lg backdrop-blur-3xl transition-all ease-linear hover:bg-black/20"
               >
-                SignIn
+                Sign In
               </Link>
             </div>
           )}
+
           <Link href={"/bookmark"}>
             {pathName === "bookmark" ? (
               <BookmarkCheck className="size-6" />

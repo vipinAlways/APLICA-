@@ -75,7 +75,7 @@ const Page = () => {
             )}
           >
             {user?.UserPlan?.planType === plan.plan && (
-              <div className="text-muted absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border-2 border-green-700 bg-green-600 px-3 text-lg">
+              <div className="text-muted absolute -top-4 left-1/2 -translate-x-1/2 rounded-full  bg-green-600 px-3 text-lg">
                 <span>Current</span>
               </div>
             )}
