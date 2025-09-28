@@ -54,7 +54,7 @@ export const paymentRoute = createTRPCRouter({
         }
 
         const stripeSession = await stripe.checkout.sessions.create({
-          success_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}/thankyou`,
+          success_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}`,
           cancel_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}/billings`,
           payment_method_types: ["card", "amazon_pay"],
           mode: "payment",
@@ -73,11 +73,10 @@ export const paymentRoute = createTRPCRouter({
           metadata: {
             userID: id,
             orderId: user.email,
-            userPlan:input.userPlan
+            userPlan: input.userPlan,
           },
         });
 
-     
         return { url: stripeSession.url };
       } catch (error) {
         console.log(error);

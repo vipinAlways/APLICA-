@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import type { PlanType } from "@prisma/client";
 import type Stripe from "stripe";
 import { stripe } from "~/lib/stripe";
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     );
   } catch (err) {
     console.log(err);
-    return new Response("Webhook Error", { status: 400 },);
+    return new Response("Webhook Error", { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
@@ -33,8 +33,15 @@ export async function POST(req: Request) {
       console.error("Invalid metadata in session:", session.metadata);
       return new Response("Invalid metadata", { status: 400 });
     }
+    const updatesUserPlan = await db.userPlan.update({
+      where: { userId },
+      data: { planType: userPlan as PlanType },
+    });
 
-    await db.user.update({
+    if (!updatesUserPlan) {
+      throw new Error("Cann't find the user");
+    }
+    const updateduserFeatues = await db.user.update({
       where: { id: userId },
       data: {
         resumeUpload: 0,
@@ -44,10 +51,9 @@ export async function POST(req: Request) {
       },
     });
 
-    await db.userPlan.update({
-      where: { userId },
-      data: { planType: userPlan as PlanType },
-    });
+    if (!updateduserFeatues) {
+      throw new Error("Cann't find the user");
+    }
   }
 
   return new Response(JSON.stringify({ received: true }), { status: 200 });
