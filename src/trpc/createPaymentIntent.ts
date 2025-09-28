@@ -57,7 +57,7 @@ export const paymentRoute = createTRPCRouter({
           success_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}/thankyou`,
           cancel_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}/billings`,
           payment_method_types: ["card", "amazon_pay"],
-          mode: "subscription",
+          mode: "payment",
           line_items: [
             {
               price_data: {
@@ -73,12 +73,14 @@ export const paymentRoute = createTRPCRouter({
           metadata: {
             userID: id,
             orderId: user.email,
-            userPlan: input.userPlan,
+            userPlan:input.userPlan
           },
         });
 
+     
         return { url: stripeSession.url };
       } catch (error) {
+        console.log(error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Internal server Error",

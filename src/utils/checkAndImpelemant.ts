@@ -55,9 +55,7 @@ export const checkAndImpelement = async ({
       });
     }
 
-    if (checkLimt?.[feature] <= maxLimit) {
-      return true;
-    }
+    if (checkLimt?.[feature] <= maxLimit) return true;
 
     throw new TRPCError({
       code: "TOO_MANY_REQUESTS",
@@ -65,6 +63,8 @@ export const checkAndImpelement = async ({
     });
   } catch (error) {
     if (error instanceof TRPCError) throw error;
+
+    console.log(error);
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Please try again later",

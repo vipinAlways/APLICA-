@@ -22,7 +22,7 @@ const Page = () => {
         route.replace(url!);
       },
       onError: (error) => {
-        console.error("Failed to create payment intent:", error);
+        console.error("Failed to create payment intent:", error.message);
       },
     });
 
