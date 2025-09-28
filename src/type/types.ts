@@ -1,3 +1,5 @@
+import type { PlanType } from "@prisma/client";
+
 export interface ResumeImprovementResponse {
   polished_resume: string;
   mistakes_and_suggestions: string[];
@@ -49,12 +51,11 @@ export interface JobCardProps {
   job_apply_link: string;
 }
 
-export interface planFeatures {
-  [types: string]: {
-    coverLetter: string;
-  };
+export interface PlanFeatures {
+  plan: PlanType;
+  price: "0" | "40" | "100";
+  features: featureTypes;
 }
-
 export interface featureTypes {
   numberOfCoverLetter: number;
   numberOfEmail: number;

@@ -1,4 +1,5 @@
 import { PlanType } from "@prisma/client";
+import type { PlanFeatures } from "~/type/types";
 
 export const promptForSuggestions = `You are a resume improvement assistant. Analyze the resume and return JSON with these exact keys:
 
@@ -59,10 +60,10 @@ Rules:
 - The value for "coverLetter" must always be a single string.
 `;
 
-export const planFeatures = [
+export const planFeatures:PlanFeatures[] = [
   {
     plan: PlanType.BASE,
-    price: 0,
+    price: "0",
     features: {
       numberOfCoverLetter: 10,
       numberOfEmail: 10,
@@ -72,7 +73,7 @@ export const planFeatures = [
   },
   {
     plan: PlanType.PRO,
-    price: 40,
+    price: "40",
     features: {
       numberOfCoverLetter: 1000,
       numberOfEmail: 1000,
@@ -82,7 +83,7 @@ export const planFeatures = [
   },
   {
     plan: PlanType.ELITE,
-    price: 100,
+    price: "100",
     features: {
       numberOfCoverLetter: Infinity,
       numberOfEmail: Infinity,

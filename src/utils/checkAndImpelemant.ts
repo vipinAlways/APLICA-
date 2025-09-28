@@ -1,4 +1,3 @@
-import type { PlanType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { planFeatures } from "~/lib/const";
 import { db } from "~/server/db";
@@ -34,7 +33,7 @@ export const checkAndImpelement = async ({
       });
     }
     const maxLimit = planFeatures.find(
-      (plan) => plan.plan === (userPlan.planType as PlanType),
+      (plan) => plan.plan === userPlan.planType,
     )?.features[feature];
 
     if (!maxLimit) {
@@ -43,7 +42,7 @@ export const checkAndImpelement = async ({
         message: "Server Issue",
       });
     }
-    const checkLimt = await db.user.findFirst({
+    const checkLimt = await db.user.findUnique({
       where: {
         id: userId,
       },

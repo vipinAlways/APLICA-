@@ -223,8 +223,8 @@ const Nav = () => {
                       <h5 className="mb-2 font-medium">Limits</h5>
                       {Object.entries(currentPlanFeatures).map(
                         ([key, value]) => {
-                          // Safely get usage with fallback
-                          const usage = (user as any)?.[key] ?? 0;
+                          type UserKey = keyof typeof user;
+                          const usage = user?.[key as UserKey] ?? 0;
                           const percentage =
                             value === Infinity
                               ? 100
@@ -244,7 +244,10 @@ const Nav = () => {
                                   {value === Infinity ? "∞" : String(value)}
                                 </span>
                               </div>
-                              <Progress value={percentage}  className={cn(percentage >90 && "bg-red-600")}/>
+                              <Progress
+                                value={percentage}
+                                className={cn(percentage > 90 && "bg-red-600")}
+                              />
                             </div>
                           );
                         },

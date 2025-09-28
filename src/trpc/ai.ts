@@ -11,7 +11,6 @@ import {
   promptForProfessionEmail,
   promptForSuggestions,
 } from "~/lib/const";
-import { auth } from "~/server/auth";
 import { TRPCError } from "@trpc/server";
 import type {
   promptForCoverLetterResponse,
