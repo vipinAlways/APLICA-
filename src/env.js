@@ -20,6 +20,7 @@ export const env = createEnv({
     // STRIPE_PUBLIC_KEY: z.string(),
     RAPIDAPI_KEY: z.string(),
     STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SIGNING_SECRET:z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -49,6 +50,7 @@ export const env = createEnv({
     RAPIDAPI_KEY: process.env.RAPIDAPI_KEY,
     NODE_ENV: process.env.NODE_ENV,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SIGNING_SECRET:process.env.STRIPE_WEBHOOK_SIGNING_SECRET
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

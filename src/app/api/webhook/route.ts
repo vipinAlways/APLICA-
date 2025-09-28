@@ -1,3 +1,4 @@
+"use server"
 import type { PlanType } from "@prisma/client";
 import type Stripe from "stripe";
 import { stripe } from "~/lib/stripe";
