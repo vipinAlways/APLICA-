@@ -38,20 +38,14 @@ export const paymentRoute = createTRPCRouter({
           });
         }
 
-        const paymentIntent = await stripe.products.create({
-          name: `${input.userPlan} bought by ${user.email}`,
-          default_price_data: {
-            currency: "USD",
-            unit_amount: input.amount,
+        const paymentIntent = await ctx.db.paymentIntent.create({
+          data: {
+            amount: input.amount,
+            planType: input.userPlan,
+            status: "PENDING",
+            userId: id,
           },
         });
-
-        if (!paymentIntent) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Server issue while heading to the payment Gateway",
-          });
-        }
 
         const stripeSession = await stripe.checkout.sessions.create({
           success_url: `${process.env.NEXT_PUBLIC_REDIRECTURL}`,
@@ -71,8 +65,8 @@ export const paymentRoute = createTRPCRouter({
             },
           ],
           metadata: {
-            userID: id,
-            orderId: user.email,
+            userId: id,
+            orderId: paymentIntent.id,
             userPlan: input.userPlan,
           },
         });

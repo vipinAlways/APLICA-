@@ -20,7 +20,11 @@ export const env = createEnv({
     // STRIPE_PUBLIC_KEY: z.string(),
     RAPIDAPI_KEY: z.string(),
     STRIPE_SECRET_KEY: z.string(),
-    STRIPE_WEBHOOK_SIGNING_SECRET:z.string(),
+    STRIPE_WEBHOOK_SIGNING_SECRET: z.string(),
+    EMAIL_SERVER: z.string(),
+    EMAIL_FROM: z.string(),
+    EMAIL_SERVER_HOST: z.string(),
+    EMAIL_SERVER_PORT: z.number().int(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -50,7 +54,13 @@ export const env = createEnv({
     RAPIDAPI_KEY: process.env.RAPIDAPI_KEY,
     NODE_ENV: process.env.NODE_ENV,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SIGNING_SECRET:process.env.STRIPE_WEBHOOK_SIGNING_SECRET
+    STRIPE_WEBHOOK_SIGNING_SECRET: process.env.STRIPE_WEBHOOK_SIGNING_SECRET,
+    EMAIL_SERVER: process.env.EMAIL_SERVER,
+    EMAIL_FROM: process.env.EMAIL_SERVER,
+    EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
+    EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT
+      ? parseInt(process.env.EMAIL_SERVER_PORT)
+      : undefined,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
