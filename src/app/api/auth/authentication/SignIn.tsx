@@ -2,8 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
-import { motion } from "motion/react";
-import { api } from "~/trpc/react";
+
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { useRouter } from "next/navigation";
@@ -36,7 +35,7 @@ const SignIn = () => {
 
       router.push("/api/auth/verify-request");
     },
-    [authProp.email],
+    [authProp.email,router],
   );
 
   return (
