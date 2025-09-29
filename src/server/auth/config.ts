@@ -1,6 +1,8 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import NodemailerProvider from "next-auth/providers/nodemailer";
+
 import { db } from "~/server/db";
 import { clearVerificationTokens } from "./clearVerificationTokens";
 
@@ -23,29 +25,20 @@ export const authConfig = {
   },
   adapter: PrismaAdapter(db),
   providers: [
-    // NodemailerProvider({
-    //   server: process.env.EMAIL_SERVER,
-    //   from: process.env.EMAIL_FROM,
-    // }),
+    NodemailerProvider({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
       allowDangerousEmailAccountLinking: true,
     }),
   ],
-  trustHost: true,
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        await db.userPlan.upsert({
-          where: { userId: user.id },
-          update: {}, 
-          create: {
-            planType: "BASE",
-            userId: user.id!,
-          },
-        });
         await clearVerificationTokens();
         return {
           ...token,

@@ -6,27 +6,22 @@ import { motion } from "motion/react";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface SignInProps {
   email: string;
-  name: string;
-  password: string;
   disable: boolean;
 }
 
 const SignIn = () => {
   const [authProp, setAuthProp] = useState<SignInProps>({
     email: "",
-    name: "",
-    password: "",
     disable: false,
   });
-  const userQuery = api.user.existingUser.useQuery(undefined, {
-    enabled: !!authProp.email && authProp.email.includes("@"),
-  });
-  const [isSignIn, setIsSignIn] = useState<boolean>(true);
+  const router = useRouter();
+
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (!authProp.email.includes("@")) {
@@ -34,27 +29,20 @@ const SignIn = () => {
         return;
       }
 
-      const isExistingUser = userQuery.data;
-
       await signIn("nodemailer", {
         email: authProp.email,
-        callbackUrl: isExistingUser ? "/" : "/profile",
+        callbackUrl: "/",
       });
 
-      setAuthProp((prev) => ({ ...prev, disable: true }));
+      router.push("/api/auth/verify-request");
     },
-    [authProp.email, userQuery.data],
+    [authProp.email],
   );
 
-  // const handleSignup = useCallback(async () => {
-  //   //TODO:signup functionality with credentical
-  //   console.log("hogyasignup");
-  // }, []);
-
   return (
-    <section className="mt-20 flex w-full items-center justify-center ">
-      <div className="relative flex items-stretch ">
-        <div className="flex w-96 flex-1 flex-col h-96 items-center justify-between rounded-tl-lg rounded-bl-lg bg-black/10 backdrop-blur-3xl p-8">
+    <section className="mt-20 flex w-full items-center justify-center">
+      <div className="relative flex items-stretch">
+        <div className="flex h-96 w-96 flex-1 flex-col items-center justify-between rounded-tl-lg rounded-bl-lg bg-black/10 p-8 backdrop-blur-3xl">
           <h1 className="text-center text-xl font-semibold sm:text-2xl">
             Welcome Back
           </h1>
@@ -66,7 +54,7 @@ const SignIn = () => {
             <div className="flex w-full flex-col gap-2">
               <label htmlFor="email">Email</label>
               <input
-                className="borr rounded-md p-2 text-lg   focus:outline-white"
+                className="borr rounded-md p-2 text-lg focus:outline-white"
                 id="email"
                 type="email"
                 placeholder="Email"
@@ -103,7 +91,7 @@ const SignIn = () => {
 
         <div
           className={cn(
-            "from-sidebar-accent to-sidebar  h-96 w-96 flex-1 flex-col items-center justify-center gap-4 rounded-tr-lg rounded-br-lg border bg-black/10 backdrop-blur-3xl  md:flex",
+            "from-sidebar-accent to-sidebar h-96 w-96 flex-1 flex-col items-center justify-center gap-4 rounded-tr-lg rounded-br-lg border bg-black/10 backdrop-blur-3xl max-md:hidden md:flex",
           )}
         >
           <h2 className="text-3xl font-semibold">Welcome To</h2>

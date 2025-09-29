@@ -59,9 +59,6 @@ const Nav = () => {
       retry: 1,
     });
 
-  const fallbackAvatar =
-    "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
   const getInitials = (name: string | null | undefined) => {
     if (!name) return "U";
     return name
@@ -103,7 +100,7 @@ const Nav = () => {
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
                     <AvatarImage
-                      src={user?.image ?? fallbackAvatar}
+                      src={user?.image ?? ""}
                       alt={user?.name ?? "User avatar"}
                     />
                     <AvatarFallback className="text-lg">
@@ -113,7 +110,7 @@ const Nav = () => {
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {user?.name ?? "User"}
+                      {user?.email ?? "User"}
                     </p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
@@ -121,8 +118,8 @@ const Nav = () => {
 
                 <DrawerContent>
                   <DrawerHeader>
-                    <DrawerTitle>{user?.name ?? ""}</DrawerTitle>
-                    <DrawerDescription>{user?.email}</DrawerDescription>
+                    <DrawerTitle>{user?.email ?? ""}</DrawerTitle>
+                    <DrawerDescription>User Details</DrawerDescription>
                   </DrawerHeader>
 
                   <DrawerFooter className="flex gap-2">
@@ -148,6 +145,48 @@ const Nav = () => {
                       <LogOut className="size-4 text-black" />
                       Logout
                     </Button>
+
+                    {currentPlanFeatures && (
+                      <div className="flex flex-col items-start px-4">
+                        <h5 className="mb-2 font-medium">Limits</h5>
+                        {Object.entries(currentPlanFeatures).map(
+                          ([key, value]) => {
+                            type UserKey = keyof typeof user;
+                            const usage = user?.[key as UserKey] ?? 0;
+                            const percentage =
+                              value === Infinity
+                                ? 100
+                                : Math.min(
+                                    (Number(usage) / Number(value)) * 100,
+                                    100,
+                                  );
+
+                            return (
+                              <div
+                                key={key}
+                                className="mb-2 w-full space-y-1.5"
+                              >
+                                <div className="flex justify-between text-sm">
+                                  <span className="capitalize">
+                                    {key.replace(/([A-Z])/g, " $1").trim()}
+                                  </span>
+                                  <span>
+                                    {String(usage)} /{" "}
+                                    {value === Infinity ? "∞" : String(value)}
+                                  </span>
+                                </div>
+                                <Progress
+                                  value={percentage}
+                                  className={cn(
+                                    percentage > 90 && "bg-red-600",
+                                  )}
+                                />
+                              </div>
+                            );
+                          },
+                        )}
+                      </div>
+                    )}
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
@@ -156,19 +195,19 @@ const Nav = () => {
                 <DropdownMenuTrigger className="border-border/20 flex w-72 items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
                   <Avatar>
                     <AvatarImage
-                      src={user?.image ?? fallbackAvatar}
+                      src={user?.image ?? ""}
                       alt={user?.name ?? "User avatar"}
                     />
                     <AvatarFallback className="text-lg">
-                      {getInitials(user?.name)}
+                      {getInitials(user?.email)}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {user?.name ?? "User"}
+                      {user?.email ?? "User"}
                     </p>
-                    <p className="w-full truncate text-xs">{user?.email}</p>
+                    <p className="w-full truncate text-xs">User Details</p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />
                 </DropdownMenuTrigger>
@@ -180,10 +219,7 @@ const Nav = () => {
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-1">
                       <span className="truncate font-medium">
-                        {user?.name ?? "User"}
-                      </span>
-                      <span className="text-muted-foreground truncate text-sm font-normal">
-                        {user?.email ?? "Email"}
+                        {user?.email ?? "User"}
                       </span>
                     </div>
                   </DropdownMenuLabel>
@@ -217,7 +253,6 @@ const Nav = () => {
                     </Link>
                   </DropdownMenuItem>
 
-                  {/* Only show limits if user has a plan and features exist */}
                   {currentPlanFeatures && (
                     <DropdownMenuItem className="flex flex-col items-start px-4">
                       <h5 className="mb-2 font-medium">Limits</h5>
