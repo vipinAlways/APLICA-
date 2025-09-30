@@ -4,7 +4,7 @@ import { auth } from "./index";
 
 export async function checkIsAuthenticated() {
   const session = await auth();
-  if (session) {
+  if (session?.user) {
     return true;
   } else {
     return false;

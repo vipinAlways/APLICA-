@@ -200,20 +200,21 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                 </span>
               </div>
 
-              {(job.job_salary_min ?? job.job_salary_max) && (
+              {job?.job_salary_min !== 0 || job?.job_salary_max !== 0 ? (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <DollarSign className="h-4 w-4" />
                   <span>
-                    {job.job_salary_min
+                    {job?.job_salary_min
                       ? `$${job.job_salary_min.toLocaleString()}`
                       : ""}
-                    {job.job_salary_max
+                    {job?.job_salary_max
                       ? ` - $${job.job_salary_max.toLocaleString()}`
-                      : ""}
+                      : ""} 
                   </span>
                 </div>
+              ) : (
+                <div>Not Disclosed</div>
               )}
-
               <p className="text-sm text-gray-700">{shortDescription}...</p>
               <p className="text-xs text-gray-500">
                 Listed on:{" "}

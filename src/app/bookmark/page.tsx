@@ -19,8 +19,9 @@ import {
 import { api } from "~/trpc/react";
 
 const Page = () => {
+  const [jobs] = api.user.bookmarkJobs.useSuspenseQuery();
   const session = useSession();
-
+  console.log({ jobs });
   if (!session.data) {
     return (
       <div className="mt-20 flex w-full flex-col items-center justify-center gap-4">
@@ -34,15 +35,11 @@ const Page = () => {
       </div>
     );
   }
-  const [jobs] = api.user.bookmarkJobs.useSuspenseQuery();
   if (!jobs) {
     return <p>No data find</p>;
   }
   return (
-    <div className="h-full w-full">
-      <Head>
-        <title>Aplica</title>
-      </Head>
+    <div className="items-cente flex h-full w-full flex-wrap gap-4 gap-x-3">
       {jobs.JobCard.length > 0 ? (
         jobs.JobCard.map((job) => (
           <Card className="w-full max-w-xl rounded-2xl shadow-md" key={job.id}>
@@ -76,7 +73,7 @@ const Page = () => {
                 </span>
               </div>
 
-              {(job?.job_salary_min ?? job?.job_salary_max) && (
+              {job?.job_salary_min !== 0 || job?.job_salary_max !== 0 ? (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <DollarSign className="h-4 w-4" />
                   <span>
@@ -87,6 +84,10 @@ const Page = () => {
                       ? ` - $${job.job_salary_max.toLocaleString()}`
                       : ""}
                   </span>
+                </div>
+              ) : (
+                <div>
+                  Not Disclosed
                 </div>
               )}
 
@@ -101,7 +102,7 @@ const Page = () => {
                   <Button>Apply Now</Button>
                 </DialogTrigger>
 
-                <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-4xl">
+                <DialogContent className="flex md:h-4/5   max-w-sm flex-col gap-4 sm:min-w-4xl">
                   <DialogHeader className="flex h-10 w-full items-center justify-center">
                     <DialogTitle>
                       <i>Aplica-</i>

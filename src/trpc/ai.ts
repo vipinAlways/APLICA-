@@ -166,7 +166,6 @@ export const pdfRoute = createTRPCRouter({
         const rawOutput = completion.choices?.[0]?.message?.content?.trim();
 
         if (!rawOutput) {
-          
           throw new TRPCError({
             code: "UNPROCESSABLE_CONTENT",
             message: "AI service returned empty response",
@@ -321,6 +320,12 @@ export const pdfRoute = createTRPCRouter({
 
         const parsedJson = JSON.parse(cleanedOutput) as promptForJobFitResponse;
         aiResult = promptForJobFitSchema.parse(parsedJson);
+        await ctx.db.user.update({
+          where: { id: ctx.session?.user.id },
+          data: {
+            numberOfScore: { increment: 1 },
+          },
+        });
       } catch (parseError) {
         const fallbackResult = extractFallbackData(
           rawOutput,
@@ -414,6 +419,13 @@ Escape all special characters properly inside strings (e.g. newlines as \\n).`,
 
         const parsedJson = JSON.parse(safeOutput) as promptForEmailResponse;
         aiResult = promptForEmailSchema.parse(parsedJson);
+
+        await ctx.db.user.update({
+          where: { id: ctx.session?.user.id },
+          data: {
+            numberOfEmail: { increment: 1 },
+          },
+        });
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
         console.error("Parse error:", parseError);
@@ -511,6 +523,13 @@ Escape all special characters properly inside strings (e.g. newlines as \\n)..`,
           cleanedOutput,
         ) as promptForCoverLetterResponse;
         aiResult = promptForCoverLetterSchema.parse(parsedJson);
+
+        await ctx.db.user.update({
+          where: { id: ctx.session?.user.id },
+          data: {
+            numberOfCoverLetter: { increment: 1 },
+          },
+        });
       } catch (parseError) {
         console.error("Invalid AI response:", rawOutput);
         console.error("Parse error:", parseError);

@@ -1,3 +1,4 @@
+import type { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { planFeatures } from "~/lib/const";
 import { db } from "~/server/db";
@@ -21,41 +22,53 @@ export const checkAndImpelement = async ({
   }
   try {
     const userPlan = await db.userPlan.findFirst({
-      where: {
-        userId,
-      },
+      where: { userId },
     });
 
     if (!userPlan) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "cannot find any active plan",
+        message: "Cannot find any active plan",
       });
     }
+
     const maxLimit = planFeatures.find(
       (plan) => plan.plan === userPlan.planType,
     )?.features[feature];
 
-    if (!maxLimit) {
+    if (maxLimit === undefined) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Server Issue",
       });
     }
-    const checkLimt = await db.user.findUnique({
-      where: {
-        id: userId,
-      },
+
+    const checkLimit = await db.user.findUnique({
+      where: { id: userId },
     });
 
-    if (!checkLimt) {
+    if (!checkLimit) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "user is not defined",
+        message: "User not found",
       });
     }
 
-    if (checkLimt?.[feature] <= maxLimit) return true;
+  
+    if (feature === "resumeUpload") {
+      if (!checkLimit.resumeUpload && maxLimit > 0) {
+        return true; // User can upload resume
+      }
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "You have already uploaded a resume. Upgrade plan for more.",
+      });
+    }
+
+    
+    if ((checkLimit as User)[feature] < maxLimit) {
+      return true;
+    }
 
     throw new TRPCError({
       code: "TOO_MANY_REQUESTS",

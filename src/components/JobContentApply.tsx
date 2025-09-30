@@ -6,7 +6,16 @@ import { Button } from "./ui/button";
 import { useIsMobile } from "~/hooks/use-mobile";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { Copy, CopyCheck, Loader2Icon } from "lucide-react";
+import { Copy, CopyCheck, Loader2Icon, RocketIcon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [email, setEmail] = useState("");
@@ -14,7 +23,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const [activeTab, setActiveTab] = useState("fitscore"); // normalized default
   const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
-
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
   const utils = api.useUtils();
   const {
     mutate: fitScoreMutate,
@@ -25,6 +34,13 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     onSuccess: async () => {
       await utils.user.existingUser.invalidate();
       toast("here what you want");
+    },
+    onError: (error) => {
+      if (error?.data?.code === "TOO_MANY_REQUESTS") {
+        setShowLimitAlert(true);
+      } else {
+        toast.error(error.message ?? "Something went wrong");
+      }
     },
   });
 
@@ -40,6 +56,13 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
       await utils.user.existingUser.invalidate();
       toast("Here is your Email");
     },
+    onError: (error) => {
+      if (error?.data?.code === "TOO_MANY_REQUESTS") {
+        setShowLimitAlert(true);
+      } else {
+        toast.error(error.message ?? "Something went wrong");
+      }
+    },
   });
 
   const {
@@ -53,6 +76,13 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
 
       await utils.user.existingUser.invalidate();
       toast("Here is your cover letter");
+    },
+    onError: (error) => {
+      if (error?.data?.code === "TOO_MANY_REQUESTS") {
+        setShowLimitAlert(true);
+      } else {
+        toast.error(error.message ?? "Something went wrong");
+      }
     },
   });
   const handleCopy = async (text: string) => {
@@ -182,7 +212,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                 return;
               }
 
-              await handleCopy(email);
+              await handleCopy(email    );
             }}
             className="Z-10 absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
           >
@@ -212,7 +242,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             ></textarea>
           )}
 
-          {/* <p className="text-gray-500">No Data found 🎉</p> */}
+
         </div>
       ),
     },
@@ -264,8 +294,30 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const tabsToShow = isMobile ? navConsts : navConsts.slice(1);
 
   return (
-    <div className="w-full space-y-10 p-1">
-      <div className="flex h-96 w-full gap-5">
+    <div className="w-full md:space-y-10 p-1">
+      <AlertDialog open={showLimitAlert} onOpenChange={setShowLimitAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span>
+                You have reached your limit for this feature. Upgrade your plan
+                to continue.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Link
+              href={"/billing"}
+              className="bg-muted flex gap-2 rounded-md p-1.5 text-black"
+            >
+              Upgrade <RocketIcon className="size-4" />{" "}
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <div className="flex h-96 w-full ">
         {!isMobile && (
           <div className="jobs flex min-h-[20rem] flex-1 flex-col gap-1 overflow-y-auto text-sm md:text-base">
             <h1 className="text-2xl font-bold">About Job</h1>
@@ -273,7 +325,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
               <span className="font-semibold underline">Role :</span>{" "}
               <span>{job.job_title}</span>
             </h2>
-            <h4>    
+            <h4>
               Expected Salary {job.job_salary_min} - {job.job_salary_max}
             </h4>
             <h4>Location &#128205; {job.job_location}</h4>
@@ -295,7 +347,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
           </div>
         )}
 
-        <main className="flex h-60 flex-1 flex-col gap-4 lg:h-96">
+        <main className="flex h-72 flex-1 flex-col gap-4 lg:h-96">
           <nav className="mb-3 flex w-full flex-nowrap gap-3 overflow-x-auto border-b pb-2">
             {tabsToShow.map((item) => (
               <button

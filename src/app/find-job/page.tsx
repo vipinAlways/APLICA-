@@ -6,7 +6,7 @@ import { checkIsAuthenticated } from "~/server/auth/checkIsAuthenticated";
 const FindComp = lazy(() => import("~/components/Find"));
 const page = async () => {
   const isAuthenticated = await checkIsAuthenticated();
-  if (isAuthenticated) {
+  if (! isAuthenticated) {
     redirect("/");
   }
   return (

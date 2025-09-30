@@ -36,12 +36,14 @@ export const User = createTRPCRouter({
     }),
   existingUser: publicProcedure.query(async ({ ctx }) => {
     try {
-      const existingUser = await ctx.db.user.findFirst({
+      const existingUser = await ctx.db.user.findUnique({
         where: { id: ctx.session?.user.id },
       });
 
       if (existingUser) {
         return existingUser;
+      } else {
+        return null;
       }
     } catch (error) {
       throw new Error("Failed to check existing user", { cause: error });
