@@ -64,7 +64,6 @@ export const checkAndImpelement = async ({
   } catch (error) {
     if (error instanceof TRPCError) throw error;
 
-    console.log(error);
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Please try again later",

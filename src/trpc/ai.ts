@@ -166,7 +166,7 @@ export const pdfRoute = createTRPCRouter({
         const rawOutput = completion.choices?.[0]?.message?.content?.trim();
 
         if (!rawOutput) {
-          console.log("rawopoutone");
+          
           throw new TRPCError({
             code: "UNPROCESSABLE_CONTENT",
             message: "AI service returned empty response",

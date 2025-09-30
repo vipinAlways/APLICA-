@@ -44,7 +44,6 @@ const UploadResume = () => {
         router.push("/find-job");
       },
       onError: (error) => {
-        console.log("error.data.code", error?.data?.code);
         if (error?.data?.code === "TOO_MANY_REQUESTS") {
           setShowLimitAlert(true);
         } else {

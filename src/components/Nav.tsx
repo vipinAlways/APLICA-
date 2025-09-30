@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -47,14 +47,10 @@ const Nav = () => {
   const session = useSession();
   const pathName = usePathname();
 
+  const [user] = api.user?.existingUser?.useSuspenseQuery();
+
   const { data: userPlanDetails, isLoading: isPlanLoading } =
     api.user?.userPlanDetails.useQuery(undefined, {
-      enabled: session.status === "authenticated",
-      retry: 1,
-    });
-
-  const { data: user, isLoading: isUserLoading } =
-    api.user?.existingUser?.useQuery(undefined, {
       enabled: session.status === "authenticated",
       retry: 1,
     });
@@ -70,19 +66,15 @@ const Nav = () => {
 
   const isLoading =
     session.status === "loading" ||
-    (session.status === "authenticated" && (isPlanLoading || isUserLoading));
+    (session.status === "authenticated" && isPlanLoading);
 
-  const getCurrentPlanFeatures = () => {
-    if (!userPlanDetails?.UserPlan?.planType || !user) {
-      return null;
-    }
+  const currentPlanFeatures = useMemo(() => {
+    if (!userPlanDetails?.UserPlan?.planType || !user) return null;
 
     return planFeatures.find(
-      (plan) => userPlanDetails.UserPlan?.planType === plan.plan,
+      (plan) => plan.plan === userPlanDetails.UserPlan?.planType,
     )?.features;
-  };
-
-  const currentPlanFeatures = getCurrentPlanFeatures();
+  }, [userPlanDetails, user]);
 
   return (
     <nav className="group w-full text-zinc-900">
@@ -94,7 +86,7 @@ const Nav = () => {
         <div className="flex w-fit items-center justify-center gap-1 md:w-80">
           {isLoading ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
-          ) : session.status === "authenticated" ? (
+          ) : session.data ? (
             isMobile ? (
               <Drawer>
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">
@@ -104,13 +96,13 @@ const Nav = () => {
                       alt={user?.name ?? "User avatar"}
                     />
                     <AvatarFallback className="text-lg">
-                      {getInitials(user?.name)}
+                      {getInitials(user?.email)}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex min-w-8 flex-1 flex-col gap-0.5 overflow-hidden text-left">
                     <p className="w-full truncate text-sm">
-                      {user?.email ?? "User"}
+                      {user?.email.slice(0, 10) ?? "User"} ...
                     </p>
                   </div>
                   <ChevronDownIcon className="size-4 shrink-0" />

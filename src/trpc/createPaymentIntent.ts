@@ -73,7 +73,7 @@ export const paymentRoute = createTRPCRouter({
 
         return { url: stripeSession.url };
       } catch (error) {
-        console.log(error);
+        
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Internal server Error",

@@ -2,18 +2,18 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "~/components/ui/sonner";
-import Nav from "~/components/Nav";
 import Provider from "~/components/Provider";
 import Footer from "~/components/Footer";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import Loader from "~/components/Loader";
 
 export const metadata: Metadata = {
   title: "Aplica",
   description: "Job huntion application",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/logo.png" }],
 };
 
+const LazyNav = lazy(() => import("~/components/Nav"));
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
@@ -23,13 +23,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`min-h-screen ${geist.variable}`}>
+    <html lang="en" className={`min-h-screen max-w-screen ${geist.variable}`}>
       <body className="relative w-full">
         <Suspense fallback={<Loader />}>
           <Provider>
             <Toaster />
-            <main className="relative z-20 min-h-screen w-full bg-zinc-200 md:px-10 px-3 backdrop-blur-2xl">
-              <Nav />
+            <main className="relative z-20 min-h-screen bg-zinc-200 px-3 backdrop-blur-2xl md:px-10">
+              <LazyNav />
               <div className="w-full">{children}</div>
             </main>
 

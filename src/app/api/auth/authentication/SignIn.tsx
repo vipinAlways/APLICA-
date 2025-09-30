@@ -28,14 +28,17 @@ const SignIn = () => {
         return;
       }
 
+      setAuthProp((prev) => ({ ...prev, disable: true }));
+
       await signIn("nodemailer", {
         email: authProp.email,
         callbackUrl: "/",
       });
 
+      setAuthProp((prev) => ({ ...prev, disable: false }));
       router.push("/api/auth/verify-request");
     },
-    [authProp.email,router],
+    [authProp.email, router],
   );
 
   return (
@@ -77,12 +80,16 @@ const SignIn = () => {
           <div className="text-center">Or With</div>
 
           <Button
-            onClick={() =>
-              signIn("google", {
+            onClick={async () => {
+              setAuthProp((prev) => ({ ...prev, disable: true }));
+              await signIn("google", {
                 callbackUrl: "/",
-              })
-            }
+              });
+
+              setAuthProp((prev) => ({ ...prev, disable: false }));
+            }}
             className="mt-4 flex items-center justify-center gap-2 p-5 sm:text-xl"
+            disabled={authProp.disable}
           >
             Sign in with Google
           </Button>

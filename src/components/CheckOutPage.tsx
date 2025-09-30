@@ -34,15 +34,14 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
         setErrorMessage(error.message ?? "Payment failed");
       }
     } catch (err) {
-      setErrorMessage("An unexpected error occurred");
-      console.log(err);
+      setErrorMessage("An unexpected error occurred" + String(err));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-md bg-white p-4 w-full">
+    <form onSubmit={handleSubmit} className="w-full rounded-md bg-white p-4">
       <PaymentElement />
 
       {errorMessage && (

@@ -1,19 +1,32 @@
 "use client";
 
 import type { PlanType } from "@prisma/client";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { planFeatures } from "~/lib/const";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
+import { LogInIcon } from "lucide-react";
+import Link from "next/link";
 
 if (process.env.NEXT_PUBLIC_STRIPE_KEY === undefined) {
   throw new Error("NEXT_PUBLIC_STRIPE_KEY is not defined");
-}
+} 
 
 const Page = () => {
+  const [alert, setAlert] = useState<boolean>(false);
   const [user] = api.user.userPlanDetails.useSuspenseQuery();
   const route = useRouter();
   const { mutate: createPaymentIntent, isPending } =
@@ -28,16 +41,41 @@ const Page = () => {
 
   const handleSelect = useCallback(
     ({ amount, plan }: { amount: "40" | "100"; plan: PlanType }) => {
+      if (!user) {
+        setAlert(true);
+      }
       createPaymentIntent({
         amount: amount,
         userPlan: plan,
       });
     },
-    [createPaymentIntent],
+    [createPaymentIntent,user],
   );
 
   return (
-    <div className="flex h-full flex-wrap items-center justify-center gap-5 px-20 py-20">
+    <div className="flex h-full flex-wrap items-center justify-center gap-10 px-5 py-20 md:gap-5 md:px-20">
+      <AlertDialog open={alert} onOpenChange={setAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span>
+                You have reached your limit for this feature. Upgrade your plan
+                to continue.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Link
+              href={"/api/auth/authentication"}
+              className="bg-muted flex gap-2 rounded-md p-1.5 text-black"
+            >
+              Login <LogInIcon className="size-4" />{" "}
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {planFeatures.map((plan, index) => (
         <div
           key={index}
@@ -77,9 +115,11 @@ const Page = () => {
                   amount: plan.price,
                   plan: plan.plan,
                 });
+              } else {
+                toast("Can not buy this");
               }
             }}
-        disabled={isPending || user?.UserPlan?.planType === plan.plan}  
+            disabled={isPending || user?.UserPlan?.planType === plan.plan}
           >
             Select Plan
           </Button>

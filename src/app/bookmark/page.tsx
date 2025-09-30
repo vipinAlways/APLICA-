@@ -1,5 +1,6 @@
 "use client";
-import { Building, DollarSign, MapPin, Search } from "lucide-react";
+import { Building, DollarSign, LogInIcon, MapPin, Search } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,10 +18,25 @@ import {
 } from "~/components/ui/dialog";
 import { api } from "~/trpc/react";
 
-const page = () => {
+const Page = () => {
+  const session = useSession();
+
+  if (!session.data) {
+    return (
+      <div className="mt-20 flex w-full flex-col items-center justify-center gap-4">
+        <p className="text-3xl">Opp! Looks like not authenticated </p>
+        <Link
+          href={"/api/auth/authentication"}
+          className="bg-muted flex w-fit items-center justify-center gap-2 rounded-md p-1.5 text-black"
+        >
+          Login <LogInIcon className="size-4" />{" "}
+        </Link>
+      </div>
+    );
+  }
   const [jobs] = api.user.bookmarkJobs.useSuspenseQuery();
-  if(!jobs){
-    return <p>No data find</p>
+  if (!jobs) {
+    return <p>No data find</p>;
   }
   return (
     <div className="h-full w-full">
@@ -117,4 +133,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

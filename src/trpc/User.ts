@@ -42,9 +42,9 @@ export const User = createTRPCRouter({
 
       if (existingUser) {
         return existingUser;
-      } 
+      }
     } catch (error) {
-      throw new Error("Failed to check existing user",{cause:error});
+      throw new Error("Failed to check existing user", { cause: error });
     }
   }),
   uplaodResume: protectedProcedure
@@ -65,10 +65,10 @@ export const User = createTRPCRouter({
           },
         });
       } catch (error) {
-        console.log(error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Not able to receive file please try again",
+          cause: error,
         });
       }
     }),
