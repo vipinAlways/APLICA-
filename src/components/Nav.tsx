@@ -84,6 +84,8 @@ const Nav = () => {
 
   const currentPlanFeatures = getCurrentPlanFeatures();
 
+  
+
   return (
     <nav className="group w-full text-zinc-900">
       <div className="flex w-full items-center justify-between rounded-lg p-0.5 text-lg backdrop-blur-xl transition-all duration-150 ease-linear group-hover:scale-[0.98] group-focus:bg-white/40 md:p-2 md:text-2xl">
@@ -94,7 +96,7 @@ const Nav = () => {
         <div className="flex w-fit items-center justify-center gap-1 md:w-80">
           {isLoading ? (
             <Loader2Icon className="size-5 animate-spin border-black" />
-          ) : session.status === "authenticated" ? (
+          ) : session.data ? (
             isMobile ? (
               <Drawer>
                 <DrawerTrigger className="border-border/20 flex w-full items-center justify-between gap-x-2 overflow-hidden rounded-lg border bg-white/5 p-3 hover:bg-white/10">

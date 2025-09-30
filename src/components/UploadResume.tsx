@@ -44,7 +44,6 @@ const UploadResume = () => {
         router.push("/find-job");
       },
       onError: (error) => {
-        console.log("error.data.code", error?.data?.code);
         if (error?.data?.code === "TOO_MANY_REQUESTS") {
           setShowLimitAlert(true);
         } else {
@@ -134,7 +133,7 @@ const UploadResume = () => {
             src={
               pdfFile && pdfFile.length > 0
                 ? URL.createObjectURL(pdfFile[0]!)
-                : (user?.Resume ?? "")
+                : user?.Resume ??""
             }
             className="h-72 w-4/5 rounded-md"
             loading="lazy"

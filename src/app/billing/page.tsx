@@ -37,12 +37,12 @@ const Page = () => {
   );
 
   return (
-    <div className="flex h-full flex-wrap items-center justify-center gap-5 px-20 py-20">
+    <div className="flex h-full flex-wrap items-center justify-center gap-5 md:px-20 px-5 py-20">
       {planFeatures.map((plan, index) => (
         <div
           key={index}
           className={cn(
-            "shadow-accent-foreground relative flex h-[30rem] flex-1 flex-col justify-around rounded-lg p-2 shadow-2xl",
+            "shadow-accent-foreground relative flex h-[30rem]  flex-1 flex-col justify-around rounded-lg p-2 shadow-2xl",
             user?.UserPlan?.planType === plan.plan && "shadow-green-500",
           )}
         >
@@ -79,7 +79,7 @@ const Page = () => {
                 });
               }
             }}
-        disabled={isPending || user?.UserPlan?.planType === plan.plan}  
+            disabled={isPending || user?.UserPlan?.planType === plan.plan}
           >
             Select Plan
           </Button>

@@ -13,8 +13,8 @@ const config = {
         hostname: "via.placeholder.com",
       },
     ],
-  },
+  }
 
-};
+}
 
 export default config;

@@ -65,10 +65,11 @@ export const User = createTRPCRouter({
           },
         });
       } catch (error) {
-        console.log(error);
+       
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Not able to receive file please try again",
+          cause:error
         });
       }
     }),
