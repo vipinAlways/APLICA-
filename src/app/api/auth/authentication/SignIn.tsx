@@ -28,22 +28,20 @@ const SignIn = () => {
         return;
       }
 
-      setAuthProp((prev) => ({ ...prev, disable: true }));
       await signIn("nodemailer", {
         email: authProp.email,
         callbackUrl: "/",
       });
 
       router.push("/api/auth/verify-request");
-      setAuthProp((prev) => ({ ...prev, disable: false }));
     },
-    [authProp.email, router],
+    [authProp.email,router],
   );
 
   return (
-    <section className="mt-20  flex w-full items-center justify-center">
+    <section className="mt-20 flex w-full items-center justify-center">
       <div className="relative flex items-stretch">
-        <div className="flex h-96 w-96 flex-1 flex-col items-center justify-between rounded-tl-lg rounded-lg bg-black/10 p-8 backdrop-blur-3xl">
+        <div className="flex h-96 w-96 flex-1 flex-col items-center justify-between rounded-tl-lg rounded-bl-lg bg-black/10 p-8 backdrop-blur-3xl">
           <h1 className="text-center text-xl font-semibold sm:text-2xl">
             Welcome Back
           </h1>
@@ -72,7 +70,7 @@ const SignIn = () => {
               className="w-full text-zinc-100"
               disabled={authProp.disable}
             >
-              {authProp.disable ? <span>Loading...</span> : "Sign In"}
+              Sign In
             </Button>
           </form>
 
@@ -85,7 +83,6 @@ const SignIn = () => {
               })
             }
             className="mt-4 flex items-center justify-center gap-2 p-5 sm:text-xl"
-            disabled={authProp.disable}
           >
             Sign in with Google
           </Button>

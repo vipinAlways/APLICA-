@@ -21,7 +21,8 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SIGNING_SECRET!,
     );
   } catch (err) {
-    return new Response(`Webhook Error: ${String(err)}`, { status: 400 });
+    console.log(err);
+    return new Response("Webhook Error", { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
       },
       data: {
         stripePaymentIntentId: session.payment_intent
-          ? (session.payment_intent as string)
+          ? session.payment_intent as string
           : "",
         status: "SUCCESS",
       },

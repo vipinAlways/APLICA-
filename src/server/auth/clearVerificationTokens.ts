@@ -10,6 +10,7 @@ export const clearVerificationTokens = async () => {
       },
     });
   } catch (error) {
-    throw new Error(`Failed to clear verification tokens:`, { cause: error });
+    console.log(error);
+    throw new Error(`Failed to clear verification tokens:`);
   }
 };
