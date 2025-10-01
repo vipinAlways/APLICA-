@@ -212,7 +212,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
                 return;
               }
 
-              await handleCopy(email    );
+              await handleCopy(email);
             }}
             className="Z-10 absolute top-0 right-0 bg-blue-500 px-3 py-1 text-white"
           >

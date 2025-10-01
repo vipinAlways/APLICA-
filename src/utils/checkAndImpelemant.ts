@@ -1,4 +1,3 @@
-import type { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { planFeatures } from "~/lib/const";
 import { db } from "~/server/db";
@@ -66,7 +65,7 @@ export const checkAndImpelement = async ({
     }
 
     
-    if ((checkLimit as User)[feature] < maxLimit) {
+    if (checkLimit[feature] < maxLimit) {
       return true;
     }
 

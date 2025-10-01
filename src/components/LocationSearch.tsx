@@ -7,11 +7,17 @@ interface CountryData {
 }
 
 interface Props {
-  selected: string;
-  setSelected: (val: string) => void;
+  selectedCountry: string | undefined;
+  setSelectedCountry: (val: string) => void;
+  selectedCity: string | undefined;
+  setSelectedCity: (val: string) => void;
 }
-
-export default function LocationSearch({ selected, setSelected }: Props) {
+export default function LocationSearch({
+  selectedCountry,
+  setSelectedCountry,
+  selectedCity,
+  setSelectedCity,
+}: Props) {
   const { data, isLoading } = api.locatiosns.locations.useQuery();
   const countryData: CountryData[] = useMemo(() => {
     return data ?? [];
@@ -62,9 +68,9 @@ export default function LocationSearch({ selected, setSelected }: Props) {
               <div key={c.country} className="mb-3">
                 <p
                   className={`cursor-pointer font-semibold ${
-                    selected === c.country ? "text-blue-600" : ""
+                    selectedCountry === c.country ? "text-blue-600" : ""
                   }`}
-                  onClick={() => setSelected(c.country)}
+                  onClick={() => setSelectedCountry(c.country)}
                 >
                   {c.country}
                 </p>
@@ -73,9 +79,12 @@ export default function LocationSearch({ selected, setSelected }: Props) {
                     <li
                       key={city + index}
                       className={`cursor-pointer ${
-                        selected === city ? "text-blue-600" : ""
+                        selectedCity === city ? "text-blue-600" : ""
                       }`}
-                      onClick={() => setSelected(city)}
+                      onClick={() => {
+                        setSelectedCity(city);
+                        setSelectedCountry(c.country);
+                      }}
                     >
                       {city}
                     </li>

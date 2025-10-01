@@ -1,7 +1,6 @@
 "use client";
 import { Building, DollarSign, LogInIcon, MapPin, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";

@@ -28,11 +28,14 @@ import { toast } from "sonner";
 const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const [query, setQuery] = useState(fetchedQuery);
   const [debounceQuery, setDebounceQuery] = useState(fetchedQuery);
-  const [selected, setSelected] = useState("");
+  const [selectedCity, setSelectedCity] = useState<string | undefined>("");
+  const [selectedCountry, setSelectedCountry] = useState<string | undefined>(
+    "",
+  );
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [dataHold, setDataHold] = useState<JobCardProps[]>([]);
-  const [country, setCountry] = useState("");
+
   const { data: bookmarks } = api.user.getBookmarks.useQuery();
 
   const { mutate, isPending } = api.user.addtoBookMark.useMutation({
@@ -59,7 +62,8 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   const { data, isLoading, isFetching } = api.getjobs.getJobs.useQuery(
     {
       query: debounceQuery,
-      country,
+      city: selectedCity,
+      country: selectedCountry,
       page,
     },
     {
@@ -73,10 +77,9 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
   }, [query]);
 
   useEffect(() => {
-    setCountry(selected);
     setPage(1);
     setDataHold([]);
-  }, [selected]);
+  }, [debounceQuery, selectedCity, selectedCountry]);
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -141,7 +144,8 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="flex items-center gap-1 rounded-lg border-2 border-zinc-400 p-2">
-            {selected ? selected : "Location"} <Search className="size-4" />
+            {selectedCity ?? selectedCountry ?? "Location"}{" "}
+            <Search className="size-4" />
           </DialogTrigger>
 
           <DialogContent className="max-w-xl">
@@ -150,9 +154,15 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
             </DialogHeader>
 
             <LocationSearch
-              selected={selected}
-              setSelected={(value) => {
-                setSelected(value);
+              selectedCity={selectedCity}
+              selectedCountry={selectedCountry}
+              setSelectedCity={(value) => {
+                setSelectedCity(value);
+                setOpen(false);
+              }}
+              setSelectedCountry={(value) => {
+                setSelectedCountry(value);
+                setSelectedCity("");
                 setOpen(false);
               }}
             />
@@ -209,7 +219,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
                       : ""}
                     {job?.job_salary_max
                       ? ` - $${job.job_salary_max.toLocaleString()}`
-                      : ""} 
+                      : ""}
                   </span>
                 </div>
               ) : (

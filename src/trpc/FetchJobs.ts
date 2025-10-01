@@ -15,7 +15,7 @@ export const jobsRoute = createTRPCRouter({
         country: z.string().optional(),
         city: z.string().optional(),
         page: z.number().optional(),
-        isRemote: z.boolean().default(true),
+        isRemote: z.boolean().default(false),
       }),
     )
     .query(async ({ input }) => {
@@ -24,10 +24,13 @@ export const jobsRoute = createTRPCRouter({
       )}&page=${encodeURIComponent(input.page ?? 1)}&num_pages=${encodeURIComponent(
         input.page ?? 1,
       )}&num_jobs=${encodeURIComponent(20)}&country=${encodeURIComponent(
-        input.country ?? "IN",
-      )}&city=${encodeURIComponent(input.city ?? "")}&date_posted=all&remote_jobs_only=${encodeURIComponent(
-        input.isRemote ?? false,
+        input.country?.trim() ?? "IN",
+      )}&city=${encodeURIComponent(
+        input.city?.trim() ?? "",
+      )}&date_posted=all&remote_jobs_only=${encodeURIComponent(
+        input.isRemote,
       )}`;
+
       const options = {
         method: "GET",
         headers: {
