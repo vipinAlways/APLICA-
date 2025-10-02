@@ -12,7 +12,7 @@ export const jobsRoute = createTRPCRouter({
     .input(
       z.object({
         query: z.string().min(3, "Query Must be Valid"),
-        country: z.string().optional(),
+        country: z.string().default("IN"),
         city: z.string().optional(),
         page: z.number().optional(),
         isRemote: z.boolean().default(false),
@@ -24,7 +24,7 @@ export const jobsRoute = createTRPCRouter({
       )}&page=${encodeURIComponent(input.page ?? 1)}&num_pages=${encodeURIComponent(
         input.page ?? 1,
       )}&num_jobs=${encodeURIComponent(20)}&country=${encodeURIComponent(
-        input.country?.trim() ?? "IN",
+        input.country,
       )}&city=${encodeURIComponent(
         input.city?.trim() ?? "",
       )}&date_posted=all&remote_jobs_only=${encodeURIComponent(

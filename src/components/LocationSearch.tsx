@@ -4,6 +4,7 @@ import { api } from "~/trpc/react";
 interface CountryData {
   country: string;
   cities: string[];
+  iso2: string;
 }
 
 interface Props {
@@ -20,10 +21,17 @@ export default function LocationSearch({
 }: Props) {
   const { data, isLoading } = api.locatiosns.locations.useQuery();
   const countryData: CountryData[] = useMemo(() => {
-    return data ?? [];
+ 
+    return (data ?? []).map((item) => ({
+      country: item.country,
+      cities: item.cities,
+      iso2: (item as CountryData).iso2 ?? "",
+    }));
   }, [data]);
 
   const [query, setQuery] = useState("");
+
+
 
   const filtered = useMemo(() => {
     if (!countryData.length) return [];
@@ -70,7 +78,7 @@ export default function LocationSearch({
                   className={`cursor-pointer font-semibold ${
                     selectedCountry === c.country ? "text-blue-600" : ""
                   }`}
-                  onClick={() => setSelectedCountry(c.country)}
+                  onClick={() => setSelectedCountry(c.iso2)}
                 >
                   {c.country}
                 </p>
@@ -83,7 +91,7 @@ export default function LocationSearch({
                       }`}
                       onClick={() => {
                         setSelectedCity(city);
-                        setSelectedCountry(c.country);
+                        setSelectedCountry(c.iso2);
                       }}
                     >
                       {city}

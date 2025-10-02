@@ -44,48 +44,47 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
     },
   });
 
-  const {
-    mutate: emailMutate,
-    isPending: ispendingEmail,
-    data: emaildata,
-  } = api.pdfRoute.createEmailAccToJob.useMutation({
-    mutationKey: ["getEmail", job.job_title, job.job_description],
-    onSuccess: async () => {
-      setEmail(emaildata?.parsed.email ?? "");
+  const { mutate: emailMutate, isPending: ispendingEmail } =
+    api.pdfRoute.createEmailAccToJob.useMutation({
+      mutationKey: ["getEmail", job.job_title, job.job_description],
+      onSuccess: async (parsed) => {
+        if (parsed?.parsed.email) {
+          setEmail(parsed.parsed.email);
+          toast("Here is your Email");
+        } else {
+          toast.error("No email found in response");
+        }
+        await utils.user.existingUser.invalidate();
+      },
 
-      await utils.user.existingUser.invalidate();
-      toast("Here is your Email");
-    },
-    onError: (error) => {
-      if (error?.data?.code === "TOO_MANY_REQUESTS") {
-        setShowLimitAlert(true);
-      } else {
-        toast.error(error.message ?? "Something went wrong");
-      }
-    },
-  });
+      onError: (error) => {
+        if (error?.data?.code === "TOO_MANY_REQUESTS") {
+          setShowLimitAlert(true);
+        } else {
+          toast.error(error.message ?? "Something went wrong");
+        }
+      },
+    });
 
-  const {
-    mutate: coverLetterMutate,
-    isPending: ispendingCoverletter,
-    data: coverLetterData,
-  } = api.pdfRoute.createCoverLetter.useMutation({
-    mutationKey: ["getCoverLetter", job.job_title, job.job_description],
-    onSuccess: async () => {
-      setCoverLetter(coverLetterData?.coverLetter ?? "");
+  const { mutate: coverLetterMutate, isPending: ispendingCoverletter } =
+    api.pdfRoute.createCoverLetter.useMutation({
+      mutationKey: ["getCoverLetter", job.job_title, job.job_description],
+      onSuccess: async (coverLetterData) => {
+        setCoverLetter(coverLetterData?.coverLetter ?? "");
 
-      await utils.user.existingUser.invalidate();
-      toast("Here is your cover letter");
-    },
-    onError: (error) => {
-      if (error?.data?.code === "TOO_MANY_REQUESTS") {
-        setShowLimitAlert(true);
-      } else {
-        toast.error(error.message ?? "Something went wrong");
-      }
-    },
-  });
+        await utils.user.existingUser.invalidate();
+        toast("Here is your cover letter");
+      },
+      onError: (error) => {
+        if (error?.data?.code === "TOO_MANY_REQUESTS") {
+          setShowLimitAlert(true);
+        } else {
+          toast.error(error.message ?? "Something went wrong");
+        }
+      },
+    });
   const handleCopy = async (text: string) => {
+    if (!text) toast("Error");
     await navigator.clipboard.writeText(text);
 
     setCopied(true);
@@ -218,7 +217,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
           >
             {copied ? <CopyCheck /> : <Copy />}
           </Button>
-          {!emaildata ? (
+          {!email ? (
             <Button
               onClick={() =>
                 emailMutate({
@@ -236,13 +235,11 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             <textarea
               name="email"
               id="email"
-              value={emaildata ? emaildata.parsed.email : ""}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mail mt-8 h-80 w-full overflow-y-auto rounded-md p-1"
             ></textarea>
           )}
-
-
         </div>
       ),
     },
@@ -252,7 +249,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
         <div className="relative h-full w-full overflow-y-auto rounded-lg bg-white p-1.5">
           <Button
             onClick={async () => {
-              if (!coverLetterData?.coverLetter) {
+              if (!coverLetter) {
                 toast("Empty cover Letter!");
                 return;
               }
@@ -263,7 +260,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
           >
             {copied ? <CopyCheck /> : <Copy />}
           </Button>
-          {!coverLetterData ? (
+          {!coverLetter ? (
             <Button
               onClick={() =>
                 coverLetterMutate({
@@ -281,7 +278,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             <textarea
               name="coverLetter"
               id="coverLetter"
-              value={coverLetterData ? coverLetterData.coverLetter : ""}
+              value={coverLetter}
               onChange={(e) => setCoverLetter(e.target.value)}
               className="mail mt-8 h-80 w-full overflow-y-auto rounded-md p-1"
             ></textarea>
@@ -294,7 +291,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
   const tabsToShow = isMobile ? navConsts : navConsts.slice(1);
 
   return (
-    <div className="w-full md:space-y-10 p-1">
+    <div className="w-full p-1 md:space-y-10">
       <AlertDialog open={showLimitAlert} onOpenChange={setShowLimitAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -317,7 +314,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="flex h-96 w-full ">
+      <div className="flex h-96 w-full">
         {!isMobile && (
           <div className="jobs flex min-h-[20rem] flex-1 flex-col gap-1 overflow-y-auto text-sm md:text-base">
             <h1 className="text-2xl font-bold">About Job</h1>

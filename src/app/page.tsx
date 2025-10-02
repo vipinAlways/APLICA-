@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import LocationSearch from "~/components/LocationSearch";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -11,6 +12,10 @@ import {
 import UploadResume from "~/components/UploadResume";
 
 const Page = () => {
+  const [selectedCity, setSelectedCity] = useState<string | undefined>("");
+  const [selectedCountry, setSelectedCountry] = useState<string | undefined>(
+    "",
+  );
   return (
     <div className="h-full">
       <div className="mt-20 flex w-full max-md:flex-col">
@@ -42,7 +47,29 @@ const Page = () => {
           </Dialog>
         </div>
 
-        <div className="h-96 w-full flex-1 md:w-1/2"></div>
+        <Dialog>
+          <DialogTrigger className="flex items-center gap-1 rounded-lg border-2 border-zinc-400 p-2">
+            Location
+          </DialogTrigger>
+
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Search Job</DialogTitle>
+            </DialogHeader>
+
+            <LocationSearch
+              selectedCity={selectedCity}
+              selectedCountry={selectedCountry}
+              setSelectedCity={(value) => {
+                setSelectedCity(value);
+              }}
+              setSelectedCountry={(value) => {
+                setSelectedCountry(value);
+                setSelectedCity("");
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

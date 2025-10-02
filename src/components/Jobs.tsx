@@ -170,9 +170,9 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
         </Dialog>
       </nav>
 
-      {data?.data?.map((job: JobCardProps, index: number) => {
+      {dataHold?.map((job: JobCardProps, index: number) => {
         const shortDescription = job.job_description.slice(0, 150);
-        const isBookmarked = bookmarks?.JobCard?.some(
+        const isBookmarked = bookmarks?.JobCard?.find(
           (b) => b.id === job.job_id!,
         );
         return (
@@ -238,7 +238,7 @@ const Jobs = ({ fetchedQuery }: { fetchedQuery: string }) => {
 
                 <DialogContent className="flex h-4/5 max-w-sm flex-col gap-4 sm:min-w-4xl">
                   <DialogHeader className="flex h-10 w-full items-center justify-center">
-                    <DialogTitle className="relative">
+                    <DialogTitle className="relative flex w-full items-center justify-around">
                       <i>Aplica-</i>{" "}
                       {isBookmarked ? (
                         <Button
