@@ -36,6 +36,10 @@ export const User = createTRPCRouter({
     }),
   existingUser: publicProcedure.query(async ({ ctx }) => {
     try {
+
+      if(!ctx.session?.user.id){
+        return null
+      }
       const existingUser = await ctx.db.user.findUnique({
         where: { id: ctx.session?.user.id },
       });
