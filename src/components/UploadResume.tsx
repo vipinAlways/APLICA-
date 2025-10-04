@@ -80,6 +80,18 @@ const UploadResume = () => {
   }, []);
 
   const handleContinue = useCallback(async () => {
+    if (!user) {
+      return toast.error("User Not Found ", {
+        description: (
+          <div>
+            <p>Looks like your not authenticated</p>
+            <Link href="/some-page" className="text-blue-400 underline">
+              Sign In
+            </Link>
+          </div>
+        ),
+      });
+    }
     if (!pdfFile && !user?.Resume) {
       return toast("Not able to find file", {
         description: "Please try again, thank you.",
