@@ -60,7 +60,7 @@ Rules:
 - The value for "coverLetter" must always be a single string.
 `;
 
-export const planFeatures:PlanFeatures[] = [
+export const planFeatures: PlanFeatures[] = [
   {
     plan: PlanType.BASE,
     price: "0",
@@ -90,5 +90,46 @@ export const planFeatures:PlanFeatures[] = [
       numberOfScore: Infinity,
       resumeUpload: Infinity,
     },
+  },
+];
+
+export const Features = [];
+
+export const testimonials = [
+  {
+    name: "Priya Sharma",
+    role: "Software Engineer",
+    testimonial:
+      "Aplica has transformed my job search! The AI suggestions for resumes, cover letters, and emails helped me land interviews faster and stand out to employers.",
+  },
+  {
+    name: "Rohan Verma",
+    role: "Marketing Specialist",
+    testimonial:
+      "Thanks to Aplica, my resume is now ATS-friendly, and the email templates saved me so much time. Applying for jobs has never been easier.",
+  },
+  {
+    name: "Anita Das",
+    role: "UI/UX Designer",
+    testimonial:
+      "I loved how Aplica guided me in improving my resume and cover letter. The AI tips are really practical and made my applications look professional.",
+  },
+  {
+    name: "Vikram Singh",
+    role: "Data Analyst",
+    testimonial:
+      "The AI-powered job search and resume optimization features in Aplica gave me an edge. I felt confident submitting applications knowing they were ATS-ready.",
+  },
+  {
+    name: "Neha Kapoor",
+    role: "Project Manager",
+    testimonial:
+      "Aplica made the job hunt less stressful. From drafting personalized emails to improving my CV, the app does it all and saves so much time.",
+  },
+  {
+    name: "Arjun Mehta",
+    role: "Frontend Developer",
+    testimonial:
+      "This app is a lifesaver! The AI suggestions for cover letters and resume tips are spot-on. I finally feel my applications truly reflect my skills.",
   },
 ];

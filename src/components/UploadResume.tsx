@@ -170,7 +170,7 @@ const UploadResume = () => {
                 <MousePointerSquareDashed className="mb-2 h-6 w-6 text-zinc-500" />
               ) : isUploading || isPending ? (
                 <Loader2 className="mb-2 h-6 w-6 animate-spin text-zinc-500" />
-              ) : (
+              ) : ( 
                 <File className="mb-2 h-6 w-6 text-zinc-500" />
               )}
 

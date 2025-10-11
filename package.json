@@ -40,6 +40,8 @@
     "@uploadthing/react": "^7.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "jspdf": "^3.0.2",
     "lucide-react": "^0.542.0",
     "motion": "^12.23.12",
