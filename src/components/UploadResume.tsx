@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const { useUploadThing: useUT } = generateReactHelpers<OurFileRouter>();
 
@@ -36,6 +37,7 @@ const UploadResume = () => {
   const router = useRouter();
   const [user] = api.user.existingUser.useSuspenseQuery();
   const [showLimitAlert, setShowLimitAlert] = useState(false);
+  const { data: session } = useSession();
   const { mutate, isPending } =
     api.pdfRoute.textextractAndImproveMent.useMutation({
       onSuccess: async () => {
@@ -106,13 +108,30 @@ const UploadResume = () => {
     if (pdfFile) {
       await startUpload(pdfFile);
     }
-  }, [pdfFile, user?.Resume, router, startUpload,user]);
+  }, [pdfFile, user?.Resume, router, startUpload, user]);
 
   useEffect(() => {
     if (!pdfFile?.[0]) return;
     const url = URL.createObjectURL(pdfFile[0]);
     return () => URL.revokeObjectURL(url);
   }, [pdfFile]);
+
+  if (!session?.user) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-5 rounded-md p-6">
+        <h1 className="text-2xl font-black">Ooops!</h1>
+        <p className="text-center text-gray-700">
+          Looks like you are not Signed In. Please do before giving it a try.
+        </p>
+        <Link
+          href={"/api/auth/authentication"}
+          className="w-28 rounded-md  bg-gray-200 p-2 text-center text-lg text-gray-800 "
+        >
+          Login
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <Suspense fallback={<Loader2 className="size-6 animate-spin" />}>
@@ -170,7 +189,7 @@ const UploadResume = () => {
                 <MousePointerSquareDashed className="mb-2 h-6 w-6 text-zinc-500" />
               ) : isUploading || isPending ? (
                 <Loader2 className="mb-2 h-6 w-6 animate-spin text-zinc-500" />
-              ) : ( 
+              ) : (
                 <File className="mb-2 h-6 w-6 text-zinc-500" />
               )}
 

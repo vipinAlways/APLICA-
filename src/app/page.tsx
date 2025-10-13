@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
-import Feature from "~/components/Feature";
-import HowWork from "~/components/HowWork";
-import Testimonials from "~/components/Testimonials";
+import React, { lazy } from "react";
+// import Feature from "~/components/Feature";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -14,13 +12,16 @@ import {
 } from "~/components/ui/dialog";
 import UploadResume from "~/components/UploadResume";
 
+const LazyHowWork = lazy(() => import("~/components/HowWork"));
+const LazyTestimonials = lazy(() => import("~/components/Testimonials"));
+
 const Page = () => {
   return (
     <div className="h-full">
       <div className="mt-20 w-full space-y-10">
         <div className="flex w-full items-center justify-center">
-          <div className="flex h-96 max-w-2xl flex-1 flex-col items-center justify-center gap-2 p-3 text-xl ">
-            <h1 className="text-2xl font-bold text-center md:text-5xl">
+          <div className="flex h-96 max-w-2xl flex-1 flex-col items-center justify-center gap-2 p-3 text-xl">
+            <h1 className="text-center text-2xl font-bold md:text-5xl">
               Turn Your Resume Into a Job Winning Document in Minutes
             </h1>
             <p className="text-center text-lg md:w-4/5">
@@ -49,10 +50,10 @@ const Page = () => {
           </div>
         </div>
 
-        <Feature />
-        <HowWork />
+        {/* <Feature /> */}
+        <LazyHowWork />
 
-        <Testimonials />
+        <LazyTestimonials />
       </div>
     </div>
   );
