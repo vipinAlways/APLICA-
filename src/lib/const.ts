@@ -93,7 +93,13 @@ export const planFeatures: PlanFeatures[] = [
   },
 ];
 
-export const Features = [];
+export const Features = [
+  {
+    icons: "/howwork/a1",
+    featureName: "dss",
+    description: "",
+  },
+];
 
 export const testimonials = [
   {

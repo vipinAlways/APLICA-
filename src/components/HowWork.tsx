@@ -11,19 +11,19 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 const howWorks = [
   {
-    image: "/howWroks/agents.png",
+    image: "/howwork/a1.png",
     text: "Create your personalized AI Agent — give it a name, define its role, and set it up to attend meetings for you.",
   },
   {
-    image: "/howWroks/createMeeting.png",
+    image: "/howwork/a1.png",
     text: "Schedule a meeting and assign it to your Agent in just a few clicks.",
   },
   {
-    image: "/howWroks/startm.png",
+    image: "/howwork/a1.png",
     text: "Start your one-on-one session and let your Agent handle the rest while you focus on what matters.",
   },
   {
-    image: "/howWroks/minutesOfmeeting.png",
+    image: "/howwork/a1.png",
     text: "Once the meeting ends, instantly access the recording, transcript, and AI-generated summary — plus, get insights on how to improve next time.",
   },
 ];

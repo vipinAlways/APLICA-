@@ -1,6 +1,5 @@
 "use client";
-import { Play } from "lucide-react";
-import Image from "next/image";
+
 import React from "react";
 import Feature from "~/components/Feature";
 import HowWork from "~/components/HowWork";
