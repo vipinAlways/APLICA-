@@ -286,6 +286,38 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
         </div>
       ),
     },
+    {
+      title: "Ask AI",
+      Component: (
+        <div className="relative h-72 w-full overflow-y-auto rounded-lg bg-white p-3">
+         
+          <div className="h-full overflow-y-auto pb-28">
+          
+          </div>
+
+        
+          <form
+            method="POST"
+            className="absolute bottom-3 left-0 flex w-full items-end gap-2 px-3"
+          >
+            <div className="relative w-full">
+              <textarea
+                placeholder="Type your question..."
+                className="w-full resize-none rounded-md border border-zinc-400 bg-gray-50 py-2 pr-16 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                rows={2}
+              />
+
+              <button
+                type="submit"
+                className="absolute right-2 bottom-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white transition hover:bg-blue-700"
+              >
+                Ask
+              </button>
+            </div>
+          </form>
+        </div>
+      ),
+    },
   ];
 
   const tabsToShow = isMobile ? navConsts : navConsts.slice(1);
@@ -349,7 +381,7 @@ const JobContentApply = ({ job }: { job: JobCardProps }) => {
             {tabsToShow.map((item) => (
               <button
                 key={item.title}
-                className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap lg:text-base ${
+                className={`flex items-center gap-1 rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap capitalize lg:text-base ${
                   activeTab === item.title
                     ? "bg-gray-200 text-black"
                     : "text-gray-500 hover:bg-gray-100"
