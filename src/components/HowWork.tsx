@@ -31,13 +31,13 @@ const howWorks = [
     text: "Once the meeting ends, instantly access the recording, transcript, and AI-generated summary — plus, get insights on how to improve next time.",
   },
 ];
-  
+
 const HowWork = () => {
   const autoplay = useRef(
     Autoplay({ delay: 2000, stopOnInteraction: false, stopOnMouseEnter: true }),
   );
   return (
-    <div className="h-fit max-w-full p-10">
+    <div className="h-fit max-w-full p-1">
       <h1 className="text-center md:text-6xl text-3xl font-bold">How It Works ?</h1>
       <Carousel
         plugins={[autoplay.current]}
