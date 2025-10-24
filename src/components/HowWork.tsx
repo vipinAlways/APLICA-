@@ -5,30 +5,28 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "~/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 const howWorks = [
   {
     image: "/howwork/a1.png",
-    text: "Upload your Resume To find Perfect job for you.",
+    text: "Upload your resume and discover the perfect job opportunities for you.",
   },
   {
     image: "/howwork/a2.png",
-    text: "",
-  },
-  {
-    image: "/howwork/a3.png",
-    text: "Start your one-on-one session and let your Agent handle the rest while you focus on what matters.",
+    text: "Get in-depth insights and suggestions to optimize your resume.",
   },
   {
     image: "/howwork/a4.png",
-    text: "Once the meeting ends, instantly access the recording, transcript, and AI-generated summary — plus, get insights on how to improve next time.",
+    text: "Explore jobs that match your skills and experience effortlessly.",
+  },
+  {
+    image: "/howwork/a3.png",
+    text: "Review your score, email, and cover letter details before applying.",
   },
   {
     image: "/howwork/a5.png",
-    text: "Once the meeting ends, instantly access the recording, transcript, and AI-generated summary — plus, get insights on how to improve next time.",
+    text: "Track the features available based on your active subscription plan.",
   },
 ];
 
@@ -38,24 +36,29 @@ const HowWork = () => {
   );
   return (
     <div className="h-fit max-w-full p-1">
-      <h1 className="text-center md:text-6xl text-3xl font-bold">How It Works ?</h1>
+      <h1 className="text-center text-3xl font-bold md:text-6xl">
+        How It Works ?
+      </h1>
       <Carousel
         plugins={[autoplay.current]}
         className="mx-auto w-full max-w-4xl"
       >
-        <CarouselContent className="w-full ">
+        <CarouselContent className="w-full">
           {howWorks.map((work, index) => (
-            <CarouselItem key={index} className="w-full md:p-10 p-5 flex flex-col gap-6">
-              <div className="relative h-72">
+            <CarouselItem
+              key={index}
+              className="flex w-full flex-col gap-6 p-5 md:p-10"
+            >
+              <div className="relative h-72 w-full bg-zinc-600/10 p-5">
                 <Image
                   src={work.image}
-                  alt="work"  
+                  alt="work"
                   fill
                   loading="lazy"
-                  className="object-contain md:shadow-2xl shadow-md"
+                  className="aspect-auto w-96 object-contain shadow-md md:shadow-xl"
                 />
               </div>
-              <p className="md:text-center  text-xl font-semibold break-words">
+              <p className="text-xl font-semibold break-words md:text-center">
                 {work.text}
               </p>
             </CarouselItem>
