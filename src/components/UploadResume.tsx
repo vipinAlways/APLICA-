@@ -108,7 +108,7 @@ const UploadResume = () => {
     if (pdfFile) {
       await startUpload(pdfFile);
     }
-  }, [pdfFile, user?.Resume, router, startUpload, user]);
+  }, [pdfFile, router, startUpload, user]);
 
   useEffect(() => {
     if (!pdfFile?.[0]) return;

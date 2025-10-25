@@ -105,7 +105,7 @@ export default function Testimonials() {
         <TestimonialCard testimonial={testimonial} offsetX={offsetX} />
       </div>
     ));
-  }, [testimonials, offsetX, hoveredIndex, handleMouseMove, handleMouseLeave]);
+  }, [ offsetX, hoveredIndex, handleMouseMove, handleMouseLeave]);
 
   return <div className="flex flex-col gap-2 pb-10">{testimonialItems}</div>;
 }

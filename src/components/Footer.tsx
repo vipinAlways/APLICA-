@@ -51,7 +51,7 @@ const Footer = () => {
               <a href="">
                 <Linkedin className="size-6 transition-all duration-150 ease-out hover:text-blue-600" />
               </a>
-              <a href="">
+              <a href="mailto:vipinkumarti555@gmail.com">
                 <MailIcon className="size-6 transition-all duration-150 ease-out hover:text-blue-500" />
               </a>
             </div>
